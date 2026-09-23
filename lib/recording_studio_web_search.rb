@@ -19,6 +19,8 @@ require "recording_studio_web_search/run_page"
 require "recording_studio_web_search/run_log"
 require "recording_studio_web_search/provider_catalog"
 require "recording_studio_web_search/search"
+require "recording_studio_web_search/ai_tool"
+require "recording_studio_web_search/host_boot"
 require "recording_studio_web_search/engine"
 
 module RecordingStudio

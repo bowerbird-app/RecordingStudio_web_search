@@ -87,7 +87,11 @@ Duration is `ActiveSupport::Notifications::Event#duration`. The payload never in
 
 ## Recording Studio AI
 
-This gem does not depend on `recording_studio_ai`. The AI gem should register a tool `web_search` version integer `1` whose executor calls `RecordingStudio::WebSearch.search` and returns `response.to_h`. Tool arguments: `query`, `country`, `language`, `freshness`, `count`.
+This gem does not depend on `recording_studio_ai`. When that gem is loaded, this one registers a custom tool `web_search` at version `1`. The executor calls `RecordingStudio::WebSearch.search` and returns `response.to_h`.
+
+Tool arguments are `query` (required), `country`, `language`, `freshness`, and `count`.
+
+The dummy app installs Recording Studio AI at `/recording_studio_ai` and turns on the Recording Studio AI admin section. The registered tool is listed there.
 
 ## Admin
 
