@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
-GemTemplate::Engine.routes.draw do
+RecordingStudio::WebSearch::Engine.routes.draw do
   root "home#index"
+  resources :runs, only: [:show]
 end

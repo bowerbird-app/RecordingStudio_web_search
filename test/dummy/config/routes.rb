@@ -1,10 +1,16 @@
 Rails.application.routes.draw do
+  recording_studio_admin_for :admin, at: "/admin", as: "staff_admin", root_section: :web_search
+  mount RecordingStudioAccessible::Engine, at: "/admin/access"
+  namespace :admin do
+    get "root", to: "root#show"
+  end
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.
   # Keep legacy links working by redirecting the base path to the app home.
   get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
+  mount RecordingStudio::WebSearch::Engine, at: "/addons/recording"
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

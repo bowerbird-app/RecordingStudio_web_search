@@ -1,0 +1,18 @@
+<% recording_studio_page_nav(title: "Admin", page_nav_back_url: main_app.root_path, page_nav_back_label: "Home") %>
+
+<%= render FlatPack::PageTitle::Component.new(
+  title: "Admin",
+  subtitle: "Staff tools for this site."
+) %>
+
+<% if @admin_sections.any? %>
+  <%= render FlatPack::List::Component.new(divider: true) do %>
+    <% @admin_sections.each do |section| %>
+      <%= render FlatPack::List::Item.new(href: admin_section_href(section.url), hover: true) do %>
+        <span><%= section.title %></span>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <p class="text-sm text-(--surface-muted-content-color)">Nothing to manage yet.</p>
+<% end %>

@@ -1,0 +1,13 @@
+development:
+  provider: brave
+  open_timeout: 5
+  read_timeout: 10
+  write_timeout: 5
+  instrumentation_enabled: true
+
+production:
+  provider: brave
+  open_timeout: 5
+  read_timeout: 10
+  write_timeout: 5
+  instrumentation_enabled: true
