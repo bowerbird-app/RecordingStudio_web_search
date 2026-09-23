@@ -28,6 +28,7 @@ Metrics/MethodLength:
   Exclude:
     - 'test/**/*'
     - 'lib/generators/**/*'
+    - 'db/migrate/**/*'
 
 Metrics/AbcSize:
   Exclude:
