@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
+# The default layout passes anchor_url. Page nav only draws the close control from anchor_href.
+module AdminPageNavAnchor
+  def initialize(*args, anchor_url: nil, **kwargs)
+    kwargs[:anchor_href] = anchor_url if kwargs[:anchor_href].blank? && anchor_url.present?
+    super(*args, **kwargs)
+  end
+end
+
 Rails.application.config.to_prepare do
+  page_nav = FlatPack::PageNav::Component
+  page_nav.prepend(AdminPageNavAnchor) unless page_nav < AdminPageNavAnchor
   admin_controller = RecordingStudioAdmin::ApplicationController
   next unless admin_controller.respond_to?(:skip_recording_studio_root_resolution)
 

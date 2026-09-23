@@ -13,5 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Query options, value objects, cost, and `search.recording_studio_web_search` instrumentation
 - Dummy host search page behind Devise
 - Optional admin section for providers, search runs, spend, and failures when Recording Studio Admin is installed
+- Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/releases/tag/v0.1.0

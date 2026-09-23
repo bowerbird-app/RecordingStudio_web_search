@@ -14,6 +14,12 @@
         label: "Query",
         value: params[:q]
       ) %>
+      <%= render FlatPack::Select::Component.new(
+        name: "provider",
+        label: "Provider",
+        options: @provider_options,
+        value: @provider
+      ) %>
       <%= render FlatPack::Button::Component.new(
         text: "Search",
         style: :primary,

@@ -38,7 +38,9 @@ class HomeSearchTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "form[method='get'][action='/']"
     assert_select "input[name='q']"
+    assert_select "select[name='provider'] option", text: "Brave"
     assert_includes response.body, "Query"
+    assert_includes response.body, "Provider"
     assert_includes response.body, "Search"
     refute called
     refute_includes response.body, "Brave API key is missing"

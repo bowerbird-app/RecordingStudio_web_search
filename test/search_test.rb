@@ -215,6 +215,15 @@ class SearchTest < Minitest::Test
     end
   end
 
+  def test_provider_keyword_overrides_configuration
+    RecordingStudio::WebSearch.configuration.provider = :bing
+    stub_net_http(response: json_response(success_body)) do
+      response = RecordingStudio::WebSearch.search("q", provider: :brave)
+      assert_equal :brave, response.provider
+    end
+    assert_equal :brave, last_payload[:provider]
+  end
+
   def test_authentication_error_on_401
     stub_net_http(response: json_response({ "error" => "nope" }, status: 401)) do
       error = assert_raises(RecordingStudio::WebSearch::AuthenticationError) do

@@ -41,21 +41,23 @@ module RecordingStudio
         blast_radius :site
         query { |_context| SearchRun.order(created_at: :desc) }
         filter_presentation :inline
-        filter :date_range, field: :created_at, default: :last_30_days
+        # Flatpack's "Last 4 weeks" preset is 27 days back through today.
+        filter :date_range, field: :created_at, default: :last_27_days
         filter :provider, options: -> { RecordingStudio::WebSearch.provider_names.map(&:to_s) }
         filter :status, options: %w[succeeded failed]
 
         summary do
-          label "Spent"
-          value { |context| SearchesScreen.total_spend(context.query_result.relation) }
+          label "Searches"
+          value { |context| SearchesScreen.search_count(context.query_result.relation) }
           hide_change
+          hide_period
         end
 
         chart do
-          title "Spend"
+          title "Searches"
           type :line
           series do |context|
-            [{ name: "Spent", data: SearchesScreen.spend_series(context.query_result.relation) }]
+            [{ name: "Searches", data: SearchesScreen.search_series(context) }]
           end
         end
 
@@ -87,12 +89,14 @@ module RecordingStudio
           paginate per_page: 25
         end
 
-        def self.total_spend(relation)
-          SpendAmount.new(unordered(relation).sum(:estimated_cost_usd))
+        def self.search_count(relation)
+          unordered(relation).count
         end
 
-        def self.spend_series(relation)
-          DayPoints.from(unordered(relation).group(day_bucket).sum(:estimated_cost_usd))
+        def self.search_series(context)
+          relation = context.query_result.relation
+          grouped = unordered(relation).group(day_bucket).count
+          DayPoints.from(grouped, range: context.filter_value(:date_range))
         end
 
         def self.unordered(relation)
@@ -113,7 +117,7 @@ module RecordingStudio
           ProviderCatalog.rows.map do |row|
             {
               text: "#{row.name}. #{row.status}",
-              href: context.admin_screen_path("web_search_providers")
+              href: RecordingStudio::WebSearch::Admin.screen_href(context, "web_search_providers")
             }
           end
         end
@@ -132,28 +136,35 @@ module RecordingStudio
           [{ name: "Failures", data: FailureSeries.series_for(context) }]
         end
         chart_options({ height: 220 })
-        link_to { |context| "#{context.admin_screen_path('web_search_runs')}?status=failed" }
-      end
-
-      class SpendAmount
-        def initialize(amount)
-          @amount = amount.to_f
-        end
-
-        def zero? = @amount.zero?
-        def positive? = @amount.positive?
-        def to_f = @amount
-        def -(other) = @amount - other.to_f
-        def to_s = format("$%.3f", @amount)
+        link_to { |context| RecordingStudio::WebSearch::Admin.screen_href(context, "web_search_runs", "status=failed") }
       end
 
       module DayPoints
         module_function
 
-        def from(grouped)
-          grouped.sort_by { |date, _amount| date.to_s }.map do |date, amount|
-            { x: day_label(date), y: amount.to_f }
+        def from(grouped, range: nil)
+          counts = index_counts(grouped)
+          dates_for(counts, range).map do |date|
+            { x: day_label(date), y: counts.fetch(date, 0).to_f }
           end
+        end
+
+        def index_counts(grouped)
+          grouped.transform_keys { |date| coerce_date(date) }
+        end
+
+        def dates_for(counts, range)
+          day_span(range) || counts.keys.sort
+        end
+
+        def day_span(range)
+          return unless range.respond_to?(:start_date) && range.start_date && range.end_date
+
+          (range.start_date.to_date..range.end_date.to_date).to_a
+        end
+
+        def coerce_date(date)
+          date.respond_to?(:to_date) ? date.to_date : Date.iso8601(date.to_s)
         end
 
         def day_label(date)
@@ -161,6 +172,28 @@ module RecordingStudio
 
           date.to_s
         end
+      end
+
+      def self.screen_href(context, key, extra = nil)
+        path = context.admin_screen_path(key)
+        path = "#{path}?#{extra}" if extra
+        anchor = anchor_from(context)
+        return path if anchor.blank?
+
+        join_anchor(path, anchor)
+      end
+
+      def self.anchor_from(context)
+        params = context.params
+        params[:anchor_url].presence || params["anchor_url"].presence
+      end
+
+      def self.join_anchor(path, anchor)
+        uri = URI.parse(path)
+        query = Rack::Utils.parse_nested_query(uri.query)
+        query["anchor_url"] = anchor
+        uri.query = query.to_query
+        uri.to_s
       end
 
       module FailureSeries

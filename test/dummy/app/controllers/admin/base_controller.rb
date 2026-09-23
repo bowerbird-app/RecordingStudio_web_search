@@ -12,7 +12,7 @@ class Admin::BaseController < ApplicationController
   before_action :authorize_admin_user!
 
   helper_method :recording_studio_admin_context, :recording_studio_admin_access_recording, :page_nav_anchor_url,
-                :preserve_anchor_url
+                :preserve_anchor_url, :admin_section_href
 
   private
 
@@ -56,6 +56,10 @@ class Admin::BaseController < ApplicationController
     end
   end
 
+  def admin_section_href(url)
+    join_query(url, "anchor_url" => admin_root_path)
+  end
+
   def page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
     safe_url = RecordingStudioAdmin::UrlSafety.safe_href(params[:anchor_url], allow_external: true)
     return default if safe_url.blank? || safe_url == "#"
@@ -70,10 +74,15 @@ class Admin::BaseController < ApplicationController
     return safe_url if safe_url.blank? || anchor_url.blank? || anchor_url == "#"
     return safe_url unless safe_url.start_with?("/")
 
-    uri = URI.parse(safe_url)
-    uri.query = Rack::Utils.parse_nested_query(uri.query).reverse_merge("anchor_url" => anchor_url).to_query.presence
-    uri.to_s
+    join_query(safe_url, "anchor_url" => anchor_url)
   rescue URI::InvalidURIError
     safe_url
+  end
+
+  def join_query(url, extra)
+    uri = URI.parse(url.to_s)
+    query = Rack::Utils.parse_nested_query(uri.query).merge(extra)
+    uri.query = query.to_query.presence
+    uri.to_s
   end
 end

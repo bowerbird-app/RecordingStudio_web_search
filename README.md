@@ -93,11 +93,11 @@ This gem does not depend on `recording_studio_ai`. The AI gem should register a 
 
 Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree, and the Brave key stays off the page.
 
-Mount admin on an admin root and grant Accessible access to that root. The Web search section links to Providers and Searches. Providers lists whoever can answer a search. Searches shows the last 30 days of spend, with filters for provider, dates, and status.
+Mount admin on an admin root and grant Accessible access to that root. The Web search section links to Providers and Searches. Providers lists whoever can answer a search. Searches charts each day of the last 4 weeks, with filters for provider, dates, and status.
 
 If the host also uses root switchable, skip root resolution on the admin controllers. A selected workspace is a different root, and admin will refuse the page until that check is skipped.
 
-Admin frames need Turbo. The dummy imports `@hotwired/turbo-rails` so the providers list, the spend chart, and the search log load in the browser.
+Admin frames need Turbo. The dummy imports `@hotwired/turbo-rails` so the providers list, the searches chart, and the search log load in the browser. Open a section with `anchor_url` set to the admin root so the close control can leave.
 
 Copy the log migration into the host app:
 

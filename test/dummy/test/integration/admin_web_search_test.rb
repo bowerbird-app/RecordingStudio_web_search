@@ -32,15 +32,18 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Staff tools for this site."
     assert_includes response.body, "Web search"
-    assert_select "a[href='#{staff_admin.section_path('web_search')}']"
+    section_href = "#{staff_admin.section_path('web_search')}?anchor_url=#{CGI.escape(admin_root_path)}"
+    assert_select "a[href='#{section_href}']"
   end
 
   test "web search section links to providers and searches" do
     sign_in @user
 
-    get staff_admin.root_path
+    anchor = admin_root_path
+    get staff_admin.section_path("web_search", anchor_url: anchor)
 
     assert_response :success
+    assert_select "a[href='#{anchor}']"
     assert_includes response.body, "View providers"
     assert_includes response.body, "View searches"
     assert_includes response.body, "Providers"
@@ -84,11 +87,14 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Searches"
     assert_includes response.body, "Provider"
     assert_includes response.body, "Status"
+    assert_select "input[name='start_date'][value='#{Date.current - 27}']"
+    assert_select "input[name='end_date'][value='#{Date.current}']"
 
     get staff_admin.screen_chart_path("web_search_runs")
     assert_response :success
-    assert_includes response.body, "Spend"
-    assert_includes response.body, "$0.005"
+    assert_includes response.body, "Searches"
+    refute_includes response.body, "Spend"
+    refute_includes response.body, "Last 27 days"
 
     get staff_admin.screen_table_path("web_search_runs")
     assert_response :success

@@ -13,6 +13,7 @@ module RecordingStudio
 
       def initialize(query, **options)
         @query_text = query
+        @provider = ProviderChoice.resolve(options.delete(:provider), configuration.provider)
         @options = options
         @parameters = {}
         @request_count = 0
@@ -76,8 +77,8 @@ module RecordingStudio
       end
 
       def provider_class
-        PROVIDERS.fetch(configuration.provider) do
-          raise ConfigurationError, "unknown provider: #{configuration.provider.inspect}"
+        PROVIDERS.fetch(@provider) do
+          raise ConfigurationError, "unknown provider: #{@provider.inspect}"
         end
       end
 
@@ -87,7 +88,7 @@ module RecordingStudio
 
       def base_payload
         {
-          schema_version: 1, provider: configuration.provider, operation: :web,
+          schema_version: 1, provider: @provider, operation: :web,
           query: @query_text.to_s, parameters: {}, success: false,
           request_count: 0, estimated_cost_usd: 0, result_count: nil, error_type: nil
         }
@@ -118,10 +119,19 @@ module RecordingStudio
       end
 
       def cost_for(request_count)
-        klass = PROVIDERS[configuration.provider]
+        klass = PROVIDERS[@provider]
         return 0 unless klass
 
         klass.new(configuration).estimated_cost_usd(request_count: request_count)
+      end
+    end
+
+    module ProviderChoice
+      module_function
+
+      def resolve(value, fallback)
+        chosen = value.presence || fallback
+        chosen.respond_to?(:to_sym) ? chosen.to_sym : chosen
       end
     end
   end
