@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_010200) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_23_010300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -142,6 +142,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_010200) do
     t.string "provider", null: false
     t.string "query", null: false
     t.integer "result_count"
+    t.jsonb "results", default: [], null: false
     t.string "status", null: false
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_recording_studio_web_search_runs_on_created_at"

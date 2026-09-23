@@ -81,7 +81,7 @@ module RecordingStudio
             }
           }
           column :query, title: "Query"
-          column :result_count, title: "Results"
+          column :result_count, title: "Results", value: ->(row, context) { Admin.result_count_link(row, context) }
           column :estimated_cost_usd, title: "Spent", value: lambda { |row, _context|
             format("$%.3f", row.estimated_cost_usd.to_f)
           }
@@ -172,6 +172,41 @@ module RecordingStudio
 
           date.to_s
         end
+      end
+
+      def self.result_count_link(row, context)
+        label = row.result_count.nil? ? "None" : row.result_count.to_s
+        href = run_href(context, row)
+        return label unless href && context.view_context
+
+        context.view_context.link_to(label, href, data: { turbo_frame: "_top" })
+      end
+
+      def self.run_href(context, row)
+        path = run_path(row)
+        return if path.blank?
+
+        anchor = anchor_from(context)
+        anchor.present? ? join_anchor(path, anchor) : path
+      end
+
+      def self.run_path(row)
+        mount = engine_mount_path
+        return if mount.blank?
+
+        RecordingStudio::WebSearch::Engine.routes.url_helpers.run_path(row, script_name: mount)
+      end
+
+      def self.engine_mount_path
+        route = Rails.application.routes.routes.find { |entry| web_search_mount?(entry) }
+        return if route.nil?
+
+        route.path.spec.to_s
+      end
+
+      def self.web_search_mount?(entry)
+        inner = entry.app.respond_to?(:app) ? entry.app.app : nil
+        inner.is_a?(Class) && inner.name == "RecordingStudio::WebSearch::Engine"
       end
 
       def self.screen_href(context, key, extra = nil)

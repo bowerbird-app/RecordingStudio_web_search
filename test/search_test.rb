@@ -357,6 +357,7 @@ class SearchTest < Minitest::Test
     assert_equal 2, payload[:result_count]
     assert_nil payload[:error_type]
     refute payload.key?(:exception_object)
+    refute payload.key?(:results)
     refute_includes payload.inspect, "test-brave-key"
     assert last_event.duration
   end
@@ -375,6 +376,57 @@ class SearchTest < Minitest::Test
     assert_equal "RecordingStudio::WebSearch::InvalidQueryError", payload[:error_type]
     refute payload.key?(:exception_object)
     refute payload.key?(:exception)
+    refute payload.key?(:results)
+  end
+
+  def test_log_snapshot_keeps_public_page_fields
+    logged = nil
+    results = [
+      {
+        "title" => "Sydney Opera House",
+        "url" => "https://www.example.com/opera",
+        "description" => "A landmark."
+      }
+    ]
+    RecordingStudio::WebSearch::RunLog.stub(:record, ->(payload) { logged = payload }) do
+      stub_net_http(response: json_response(success_body(results: results))) do
+        RecordingStudio::WebSearch.search("Australian architecture")
+      end
+    end
+
+    page = logged[:results].first
+    assert_equal "Sydney Opera House", page["title"]
+    assert_equal "https://www.example.com/opera", page["url"]
+    assert_equal "example.com", page["domain"]
+    assert_equal "A landmark.", page["description"]
+    assert_equal %w[title url domain description], page.keys
+    refute last_payload.key?(:results)
+    refute_includes logged.inspect, "test-brave-key"
+  end
+
+  def test_failed_log_snapshot_is_empty
+    logged = nil
+    RecordingStudio::WebSearch::RunLog.stub(:record, ->(payload) { logged = payload }) do
+      assert_raises(RecordingStudio::WebSearch::InvalidQueryError) do
+        RecordingStudio::WebSearch.search("")
+      end
+    end
+
+    assert_equal [], logged[:results]
+    refute last_payload.key?(:results)
+  end
+
+  def test_disabled_instrumentation_still_logs_a_failure
+    RecordingStudio::WebSearch.configuration.instrumentation_enabled = false
+    logged = nil
+    RecordingStudio::WebSearch::RunLog.stub(:record, ->(payload) { logged = payload }) do
+      assert_raises(RecordingStudio::WebSearch::InvalidQueryError) do
+        RecordingStudio::WebSearch.search("")
+      end
+    end
+
+    assert_equal [], logged[:results]
+    assert_empty @events
   end
 
   def test_instrumentation_can_be_disabled

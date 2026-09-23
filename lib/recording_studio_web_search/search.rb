@@ -54,7 +54,7 @@ module RecordingStudio
 
       def finish_run(payload, started)
         payload[:duration_ms] = ((monotonic_now - started) * 1000).round
-        RunLog.record(payload)
+        RunLog.record(payload.merge(results: @result_pages || []))
       end
 
       def monotonic_now
@@ -101,6 +101,7 @@ module RecordingStudio
         payload[:estimated_cost_usd] = cost_for(1)
         payload[:result_count] = response.results.size
         payload[:error_type] = nil
+        @result_pages = ResultSnapshot.pages(response.results)
       end
 
       def fill_failure(payload, error)
@@ -111,6 +112,7 @@ module RecordingStudio
         payload[:estimated_cost_usd] = cost_for(count)
         payload[:result_count] = nil
         payload[:error_type] = error.class.name
+        @result_pages = []
         error
       end
 
@@ -119,7 +121,15 @@ module RecordingStudio
       end
 
       def cost_for(request_count)
-        klass = PROVIDERS[@provider]
+        ProviderCost.usd(@provider, configuration, request_count)
+      end
+    end
+
+    module ProviderCost
+      module_function
+
+      def usd(provider, configuration, request_count)
+        klass = PROVIDERS[provider]
         return 0 unless klass
 
         klass.new(configuration).estimated_cost_usd(request_count: request_count)

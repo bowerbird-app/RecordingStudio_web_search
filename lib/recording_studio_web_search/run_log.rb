@@ -29,7 +29,8 @@ module RecordingStudio
           result_count: payload[:result_count],
           duration_ms: payload[:duration_ms],
           estimated_cost_usd: payload[:estimated_cost_usd].to_f,
-          parameters: parameters_for(payload[:parameters])
+          parameters: parameters_for(payload[:parameters]),
+          results: ResultSnapshot.pages(payload[:results])
         }
       end
 

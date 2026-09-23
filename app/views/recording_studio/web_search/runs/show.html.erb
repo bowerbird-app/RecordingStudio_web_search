@@ -1,0 +1,36 @@
+<% recording_studio_page_nav(
+     title: @run.query,
+     page_nav_back_label: "Searches",
+     page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
+   ) %>
+<% recording_studio_page_nav_right do %>
+  <%= render FlatPack::Button::Component.new(text: "Searches", href: @back_url, style: :secondary) %>
+<% end %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(title: @run.query, subtitle: @subtitle) %>
+
+  <%= render FlatPack::Badge::Component.new(
+    text: @run.outcome,
+    style: (@run.status == "succeeded" ? :success : :danger),
+    size: :sm
+  ) %>
+
+  <% if @pages.empty? %>
+    <%= render FlatPack::Alert::Component.new(style: :info, description: @empty_message) %>
+  <% else %>
+    <%= render FlatPack::List::Component.new(divider: true) do %>
+      <% @pages.each do |page| %>
+        <%= render FlatPack::List::Item.new(**result_item_options(page)) do %>
+          <span class="block font-semibold"><%= page["title"] %></span>
+          <% if page["domain"].present? %>
+            <span class="block text-sm text-(--surface-muted-content-color)"><%= page["domain"] %></span>
+          <% end %>
+          <% if page["description"].present? %>
+            <span class="mt-1 block text-sm leading-6"><%= page["description"] %></span>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

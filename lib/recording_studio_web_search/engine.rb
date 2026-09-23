@@ -107,6 +107,7 @@ module RecordingStudio
             require "recording_studio_web_search/admin"
             Admin.register!
           end
+          RunPage.prepare!
           next unless defined?(ActiveRecord::Base)
 
           ActiveRecord::Base.descendants.each do |model|

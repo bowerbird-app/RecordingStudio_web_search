@@ -72,6 +72,14 @@ class HomeSearchTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "example.com"
     assert_includes response.body, "A landmark."
     refute_includes response.body, "test-brave-key"
+
+    run = RecordingStudio::WebSearch::SearchRun.order(:created_at).last
+    page = run.results.first
+    assert_equal "Sydney Opera House", page["title"]
+    assert_equal "https://www.example.com/opera", page["url"]
+    assert_equal "example.com", page["domain"]
+    assert_equal "A landmark.", page["description"]
+    assert_equal %w[description domain title url], page.keys.sort
   end
 
   private

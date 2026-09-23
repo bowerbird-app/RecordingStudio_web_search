@@ -23,6 +23,66 @@ class RunLogTest < Minitest::Test
     assert_equal "moderate", attributes[:parameters]["safe_search"]
     assert_equal 10, attributes[:parameters]["count"]
     refute_includes attributes[:parameters].values, "secret-key"
+    assert_equal [], attributes[:results]
+  end
+
+  def test_success_keeps_a_public_page_snapshot
+    attributes = RecordingStudio::WebSearch::RunLog.attributes(
+      success: true,
+      provider: :brave,
+      query: "houses",
+      result_count: 1,
+      estimated_cost_usd: 0.005,
+      parameters: {},
+      results: [
+        {
+          title: "Opera",
+          url: "https://example.com/a",
+          domain: "example.com",
+          description: "A hall",
+          snippets: ["hidden"],
+          metadata: { api_key: "secret-key" }
+        }
+      ]
+    )
+
+    page = attributes[:results].first
+    assert_equal "Opera", page["title"]
+    assert_equal "https://example.com/a", page["url"]
+    assert_equal "example.com", page["domain"]
+    assert_equal "A hall", page["description"]
+    assert_equal %w[title url domain description], page.keys
+    refute_includes attributes[:results].to_json, "secret-key"
+    refute_includes attributes[:results].to_json, "hidden"
+  end
+
+  def test_unsafe_page_urls_are_dropped
+    attributes = RecordingStudio::WebSearch::RunLog.attributes(
+      success: true,
+      provider: :brave,
+      query: "houses",
+      estimated_cost_usd: 0,
+      parameters: {},
+      results: [{ title: "Bad", url: "javascript:alert(1)", domain: "bad" }]
+    )
+
+    assert_nil attributes[:results].first["url"]
+    refute_includes attributes[:results].to_json, "javascript:"
+  end
+
+  def test_blank_and_broken_pages_are_dropped
+    attributes = RecordingStudio::WebSearch::RunLog.attributes(
+      success: true,
+      provider: :brave,
+      query: "houses",
+      estimated_cost_usd: 0,
+      parameters: { nested: { page: :first }, tags: [:a] },
+      results: ["nope", { title: nil, url: "http://[" }, { title: "Kept", url: "mailto:hi@example.com" }]
+    )
+
+    assert_equal [{ "title" => "Kept", "url" => nil, "domain" => nil, "description" => nil }], attributes[:results]
+    assert_equal "first", attributes[:parameters]["nested"]["page"]
+    assert_equal ["a"], attributes[:parameters]["tags"]
   end
 
   def test_known_failures_use_plain_outcomes
