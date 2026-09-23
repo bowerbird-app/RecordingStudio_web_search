@@ -9,5 +9,6 @@ class AdminRoot < ApplicationRecord
 
   recording_studio_admin_sections do
     section :web_search
+    section :recording_studio_ai
   end
 end

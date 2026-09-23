@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount RecordingStudioAI::Engine, at: "/recording_studio_ai"
   recording_studio_admin_for :admin, at: "/admin", as: "staff_admin", root_section: :web_search
   mount RecordingStudioAccessible::Engine, at: "/admin/access"
   namespace :admin do
