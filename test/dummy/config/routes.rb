@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  recording_studio_admin_for :admin, at: "/admin", as: "staff_admin", root_section: :web_search
+  mount RecordingStudioAccessible::Engine, at: "/admin/access"
+  namespace :admin do
+    get "root", to: "root#show"
+  end
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.

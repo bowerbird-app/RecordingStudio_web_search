@@ -10,6 +10,14 @@ module ApplicationHelper
       concat recording_studio_root_switch_dropdown(style: :ghost, size: :md)
       concat render(
         FlatPack::Button::Component.new(
+          text: "Admin",
+          style: :ghost,
+          size: :md,
+          href: admin_root_path
+        )
+      )
+      concat render(
+        FlatPack::Button::Component.new(
           text: "Sign out",
           style: :ghost,
           size: :md,

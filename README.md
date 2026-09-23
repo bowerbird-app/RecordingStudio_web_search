@@ -89,6 +89,23 @@ Duration is `ActiveSupport::Notifications::Event#duration`. The payload never in
 
 This gem does not depend on `recording_studio_ai`. The AI gem should register a tool `web_search` version integer `1` whose executor calls `RecordingStudio::WebSearch.search` and returns `response.to_h`. Tool arguments: `query`, `country`, `language`, `freshness`, `count`.
 
+## Admin
+
+Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree, and the Brave key stays off the page.
+
+Mount admin on an admin root and grant Accessible access to that root. The Web search section links to Providers and Searches. Providers lists whoever can answer a search. Searches shows the last 30 days of spend, with filters for provider, dates, and status.
+
+If the host also uses root switchable, skip root resolution on the admin controllers. A selected workspace is a different root, and admin will refuse the page until that check is skipped.
+
+Admin frames need Turbo. The dummy imports `@hotwired/turbo-rails` so the providers list, the spend chart, and the search log load in the browser.
+
+Copy the log migration into the host app:
+
+```bash
+bin/rails generate recording_studio_web_search:migrations
+bin/rails db:migrate
+```
+
 ## Dummy app
 
 ```bash

@@ -103,6 +103,10 @@ module RecordingStudio
 
       initializer "recording_studio_web_search.apply_model_extensions" do
         config.to_prepare do
+          if defined?(RecordingStudioAdmin)
+            require "recording_studio_web_search/admin"
+            Admin.register!
+          end
           next unless defined?(ActiveRecord::Base)
 
           ActiveRecord::Base.descendants.each do |model|

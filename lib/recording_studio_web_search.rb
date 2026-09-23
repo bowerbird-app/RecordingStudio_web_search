@@ -12,6 +12,8 @@ require "recording_studio_web_search/providers/brave_request"
 require "recording_studio_web_search/providers/brave_time"
 require "recording_studio_web_search/providers/brave_mapper"
 require "recording_studio_web_search/providers/brave"
+require "recording_studio_web_search/run_log"
+require "recording_studio_web_search/provider_catalog"
 require "recording_studio_web_search/search"
 require "recording_studio_web_search/engine"
 
@@ -31,6 +33,10 @@ module RecordingStudio
 
       def search(query, **)
         Search.call(query, **)
+      end
+
+      def provider_names
+        PROVIDERS.keys
       end
     end
   end

@@ -10,10 +10,47 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_024811) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_23_010200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "admin_audit_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "access_recording_id"
+    t.string "action_key", null: false
+    t.string "actor_id"
+    t.string "actor_type"
+    t.string "blast_radius"
+    t.datetime "created_at", null: false
+    t.boolean "destructive"
+    t.string "error_class"
+    t.text "error_message"
+    t.string "event_id", null: false
+    t.string "http_method"
+    t.string "ip_address"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "occurred_at", null: false
+    t.string "outcome", null: false
+    t.string "record_id"
+    t.string "record_type"
+    t.string "recording_studio_event_id"
+    t.string "request_id"
+    t.string "required_role"
+    t.string "resource_key", null: false
+    t.string "surface_key"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["event_id"], name: "index_admin_audit_logs_on_event_id", unique: true
+    t.index ["occurred_at"], name: "index_admin_audit_logs_on_occurred_at"
+    t.index ["outcome"], name: "index_admin_audit_logs_on_outcome"
+    t.index ["resource_key", "action_key"], name: "index_admin_audit_logs_on_resource_key_and_action_key"
+  end
+
+  create_table "admin_roots", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", default: "Admin", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "folders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -94,6 +131,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_024811) do
     t.index ["actor_type", "actor_id", "device_key", "scope_key"], name: "idx_rs_root_switchable_actor_device_scope", unique: true, where: "(actor_id IS NOT NULL)"
     t.index ["device_key", "scope_key"], name: "idx_rs_root_switchable_anonymous_device_scope", unique: true, where: "(actor_id IS NULL)"
     t.index ["root_recording_id"], name: "idx_rs_root_switchable_root_recording"
+  end
+
+  create_table "recording_studio_web_search_runs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.decimal "estimated_cost_usd", precision: 12, scale: 6, default: "0.0", null: false
+    t.string "outcome", null: false
+    t.jsonb "parameters", default: {}, null: false
+    t.string "provider", null: false
+    t.string "query", null: false
+    t.integer "result_count"
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_recording_studio_web_search_runs_on_created_at"
+    t.index ["provider"], name: "index_recording_studio_web_search_runs_on_provider"
+    t.index ["status"], name: "index_recording_studio_web_search_runs_on_status"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

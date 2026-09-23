@@ -12,5 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provider-neutral `RecordingStudio::WebSearch.search` with Brave as the first provider
 - Query options, value objects, cost, and `search.recording_studio_web_search` instrumentation
 - Dummy host search page behind Devise
+- Optional admin section for providers, search runs, spend, and failures when Recording Studio Admin is installed
 
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/releases/tag/v0.1.0

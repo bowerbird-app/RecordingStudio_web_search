@@ -19,7 +19,7 @@ module RecordingStudio
       end
 
       def call
-        return perform unless configuration.instrumentation_enabled
+        return perform_and_record unless configuration.instrumentation_enabled
 
         instrumented
       end
@@ -27,17 +27,37 @@ module RecordingStudio
       private
 
       def instrumented
-        error = nil
-        result = nil
         payload = base_payload
-        ActiveSupport::Notifications.instrument(EVENT_NAME, payload) do
-          result = capture(payload)
+        started = monotonic_now
+        error = nil
+        result = ActiveSupport::Notifications.instrument(EVENT_NAME, payload) do
+          capture(payload)
         rescue Error => e
           error = fill_failure(payload, e)
         end
-        raise error if error
+        finish_run(payload, started)
+        error ? raise(error) : result
+      end
 
+      def perform_and_record
+        payload = base_payload
+        started = monotonic_now
+        result = capture(payload)
+        finish_run(payload, started)
         result
+      rescue Error => e
+        fill_failure(payload, e)
+        finish_run(payload, started)
+        raise
+      end
+
+      def finish_run(payload, started)
+        payload[:duration_ms] = ((monotonic_now - started) * 1000).round
+        RunLog.record(payload)
+      end
+
+      def monotonic_now
+        Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
 
       def capture(payload)
