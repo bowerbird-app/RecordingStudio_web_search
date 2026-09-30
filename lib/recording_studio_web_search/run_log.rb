@@ -6,6 +6,7 @@ module RecordingStudio
       OUTCOMES = {
         "RecordingStudio::WebSearch::MissingApiKeyError" => "Needs a key",
         "RecordingStudio::WebSearch::ConfigurationError" => "Needs a key",
+        "RecordingStudio::WebSearch::Usage::ConfigurationError" => Usage::CONFIGURATION_OUTCOME,
         "RecordingStudio::WebSearch::AuthenticationError" => "Can't sign in",
         "RecordingStudio::WebSearch::RateLimitError" => "Too many requests",
         "RecordingStudio::WebSearch::TimeoutError" => "Timed out",
@@ -15,11 +16,21 @@ module RecordingStudio
       module_function
 
       def attributes(payload)
-        success = payload[:success] == true
-        base_attributes(payload).merge(
-          status: success ? "succeeded" : "failed",
-          outcome: success ? "Succeeded" : outcome_for(payload[:error_type])
-        )
+        row = base_attributes(payload).merge(status: row_status(payload), outcome: row_outcome(payload))
+        attempt_id = payload[:attempt_id]
+        row[:id] = attempt_id if attempt_id
+        row
+      end
+
+      def row_status(payload)
+        payload[:success] == true ? "succeeded" : "failed"
+      end
+
+      def row_outcome(payload)
+        return "Succeeded" if payload[:success] == true
+        return Usage::DECLINED_OUTCOME if payload[:error_code] == Usage::DECLINED_CODE
+
+        outcome_for(payload[:error_type])
       end
 
       def base_attributes(payload)

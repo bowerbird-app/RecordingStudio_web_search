@@ -10,7 +10,7 @@ module RecordingStudio
 
       attr_writer :provider, :open_timeout, :read_timeout, :write_timeout,
                   :brave_usd_per_1000_requests, :instrumentation_enabled
-      attr_accessor :brave_api_key
+      attr_accessor :brave_api_key, :usage_handler, :usage_key_resolver
       attr_reader :hooks
 
       def initialize
@@ -63,7 +63,15 @@ module RecordingStudio
           brave_usd_per_1000_requests: brave_usd_per_1000_requests,
           instrumentation_enabled: instrumentation_enabled,
           hooks_registered: hooks.registered_counts
-        }
+        }.merge(usage_meter_flags)
+      end
+
+      def validate_usage_meter!
+        require_callable(:usage_handler)
+        require_callable(:usage_key_resolver)
+        return if usage_handler.nil? || usage_key_resolver.respond_to?(:call)
+
+        raise Usage::ConfigurationError, "usage_handler requires a usage_key_resolver that responds to call"
       end
 
       def inspect
@@ -77,6 +85,22 @@ module RecordingStudio
           setter = "#{key}="
           public_send(setter, value) if respond_to?(setter)
         end
+      end
+
+      private
+
+      def usage_meter_flags
+        {
+          usage_handler_configured: !usage_handler.nil?,
+          usage_key_resolver_configured: !usage_key_resolver.nil?
+        }
+      end
+
+      def require_callable(name)
+        value = public_send(name)
+        return if value.nil? || value.respond_to?(:call)
+
+        raise Usage::ConfigurationError, "#{name} must respond to call"
       end
     end
   end

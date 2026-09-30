@@ -13,10 +13,11 @@ module RecordingStudio
           @configuration = configuration
         end
 
-        def search(query)
+        def search(query, meter:)
           assert_api_key!
           request = BraveRequest.new(query, @configuration.brave_api_key)
-          map(query, perform(request))
+          meter.spend!(query: query)
+          map(query, transmit(request))
         end
 
         def estimated_cost_usd(request_count:)
@@ -34,7 +35,7 @@ module RecordingStudio
           raise MissingApiKeyError, "Brave API key is missing"
         end
 
-        def perform(request)
+        def transmit(request)
           http = Net::HTTP.new(request.uri.host, request.uri.port)
           configure_http(http)
           http.request(request.http_request)
