@@ -14,6 +14,10 @@ class ConfigurationTest < Minitest::Test
     assert_equal 5, @configuration.write_timeout
     assert_equal 5, @configuration.brave_usd_per_1000_requests
     assert_equal true, @configuration.instrumentation_enabled
+    assert_nil @configuration.usage_handler
+    assert_nil @configuration.usage_key_resolver
+    assert_equal false, @configuration.to_h[:usage_handler_configured]
+    assert_equal false, @configuration.to_h[:usage_key_resolver_configured]
     assert_instance_of RecordingStudio::Hooks, @configuration.hooks
   end
 
@@ -106,5 +110,67 @@ class ConfigurationTest < Minitest::Test
     RecordingStudio::WebSearch.configure
 
     assert_kind_of RecordingStudio::WebSearch::Configuration, RecordingStudio::WebSearch.configuration
+  end
+
+  def test_to_h_reports_usage_procs_without_the_objects
+    handler = ->(key:) { key }
+    resolver = ->(operation:) { operation }
+    @configuration.usage_handler = handler
+    @configuration.usage_key_resolver = resolver
+
+    result = @configuration.to_h
+
+    assert_equal true, result[:usage_handler_configured]
+    assert_equal true, result[:usage_key_resolver_configured]
+    refute_includes result.keys, :usage_handler
+    refute_includes result.keys, :usage_key_resolver
+    refute_includes result.values, handler
+    refute_includes result.values, resolver
+    refute_includes @configuration.inspect, handler.inspect
+    refute_includes @configuration.inspect, resolver.inspect
+  end
+
+  def test_validate_usage_meter_accepts_nil_or_a_resolver_alone
+    @configuration.validate_usage_meter!
+    @configuration.usage_key_resolver = ->(operation:) { operation }
+    @configuration.validate_usage_meter!
+  end
+
+  def test_validate_usage_meter_rejects_a_handler_that_is_not_callable
+    @configuration.usage_handler = "nope"
+
+    error = assert_raises(RecordingStudio::WebSearch::Usage::ConfigurationError) do
+      @configuration.validate_usage_meter!
+    end
+
+    assert_equal "usage_handler must respond to call", error.message
+  end
+
+  def test_validate_usage_meter_rejects_a_resolver_that_is_not_callable
+    @configuration.usage_key_resolver = "nope"
+
+    error = assert_raises(RecordingStudio::WebSearch::Usage::ConfigurationError) do
+      @configuration.validate_usage_meter!
+    end
+
+    assert_equal "usage_key_resolver must respond to call", error.message
+  end
+
+  def test_configure_rejects_a_handler_without_a_resolver
+    original = RecordingStudio::WebSearch.instance_variable_get(:@configuration)
+    RecordingStudio::WebSearch.instance_variable_set(
+      :@configuration,
+      RecordingStudio::WebSearch::Configuration.new
+    )
+
+    error = assert_raises(RecordingStudio::WebSearch::Usage::ConfigurationError) do
+      RecordingStudio::WebSearch.configure do |config|
+        config.usage_handler = ->(key:) { key }
+      end
+    end
+
+    assert_equal "usage_handler requires a usage_key_resolver that responds to call", error.message
+  ensure
+    RecordingStudio::WebSearch.instance_variable_set(:@configuration, original)
   end
 end

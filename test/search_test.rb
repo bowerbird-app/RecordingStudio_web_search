@@ -356,6 +356,9 @@ class SearchTest < Minitest::Test
     assert_in_delta 0.005, payload[:estimated_cost_usd], 0.0000001
     assert_equal 2, payload[:result_count]
     assert_nil payload[:error_type]
+    refute payload.key?(:attempt_id)
+    refute payload.key?(:error_code)
+    refute payload.key?(:error_category)
     refute payload.key?(:exception_object)
     refute payload.key?(:results)
     refute_includes payload.inspect, "test-brave-key"
@@ -374,6 +377,9 @@ class SearchTest < Minitest::Test
     assert_equal 0, payload[:estimated_cost_usd]
     assert_nil payload[:result_count]
     assert_equal "RecordingStudio::WebSearch::InvalidQueryError", payload[:error_type]
+    refute payload.key?(:attempt_id)
+    refute payload.key?(:error_code)
+    refute payload.key?(:error_category)
     refute payload.key?(:exception_object)
     refute payload.key?(:exception)
     refute payload.key?(:results)

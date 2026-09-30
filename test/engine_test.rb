@@ -93,6 +93,22 @@ class EngineTest < Minitest::Test
     assert_equal :brave, RecordingStudio::WebSearch.configuration.provider
   end
 
+  def test_load_config_validates_usage_meter_after_the_configuration_hook
+    seen = []
+    RecordingStudio::WebSearch.configuration.hooks.on_configuration do |config|
+      seen << :hook
+      config.usage_handler = ->(key:) { key }
+    end
+    app = Struct.new(:config).new(Object.new)
+
+    error = assert_raises(RecordingStudio::WebSearch::Usage::ConfigurationError) do
+      find_initializer("recording_studio_web_search.load_config").block.call(app)
+    end
+
+    assert_equal [:hook], seen
+    assert_equal "usage_handler requires a usage_key_resolver that responds to call", error.message
+  end
+
   def test_load_config_is_noop_without_config_sources
     RecordingStudio::WebSearch.configuration.brave_api_key = nil
     app = Struct.new(:config).new(Object.new)

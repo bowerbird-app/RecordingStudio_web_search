@@ -94,6 +94,7 @@ module RecordingStudio
         Engine.merge_yaml_config(app)
         Engine.merge_x_config(app)
         RecordingStudio::WebSearch.configuration.hooks.run(:on_configuration, RecordingStudio::WebSearch.configuration)
+        RecordingStudio::WebSearch.configuration.validate_usage_meter!
       end
 
       initializer "recording_studio_web_search.after_initialize",

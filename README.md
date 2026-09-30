@@ -13,6 +13,47 @@ end
 
 Timeouts default to open 5, read 10, and write 5 seconds. Cost defaults to USD 5 per 1000 Brave requests. Instrumentation is on unless you set `config.instrumentation_enabled = false`.
 
+## Charge a search
+
+Web Search names the provider operation. The host handler picks the billing line. Recording Studio Stripe maps the key to credits.
+
+A nil `usage_handler` leaves search unchanged. A nil key skips the handler. This gem has no cache, so every search that reaches Brave is a new charge. One GET is quantity 1. A provider failure after the handler returns is not refunded.
+
+`attribution:` is an optional keyword beside `provider:`. It is not a query option. Pass the same attribution object the host uses for Recording Studio AI.
+
+```ruby
+RecordingStudio::WebSearch.configure do |config|
+  config.usage_key_resolver = lambda do |provider:, operation:, attribution:, parameters:|
+    next if attribution.nil?
+
+    provider == "brave" ? "web.brave" : nil
+  end
+
+  config.usage_handler = lambda do |key:, quantity:, attribution:, idempotency_key:, metadata:|
+    RecordingStudioStripe::Billing
+      .for_recording(attribution.root_recording)
+      .line(:pressbot)
+      .spend_usage(key:, quantity:, idempotency_key:)
+  end
+end
+```
+
+```ruby
+RecordingStudio::WebSearch.search(
+  "museum openings",
+  country: "AU",
+  attribution: attribution
+)
+```
+
+The resolver keywords are `operation`, `provider`, `attribution`, and `parameters`. `operation` is `"web"`. `provider` is `"brave"` for Brave. `parameters` holds the normalized search options and keeps symbols such as `:moderate`. The query text is not included.
+
+The handler keywords are `key`, `quantity`, `attribution`, `idempotency_key`, and `metadata`. `quantity` is the integer 1. The idempotency key is the prefix `web-search-attempt`, a colon, and the attempt uuid. Metadata is a frozen hash with `operation`, `provider`, `attempt_id`, and `parameters`. Symbols in `parameters` are strings there. Metadata does not include the query, snippets, URLs, headers, or the API key.
+
+A blank key raises `RecordingStudio::WebSearch::Usage::ConfigurationError` before HTTP. So does a key that is not a String, a Symbol, or nil. A Symbol is passed to the handler as a String. The run outcome is `Check usage`. When the handler raises, `search` raises that same exception and Brave is not called. The notification uses `error_category` `"usage"` and `error_code` `"usage_declined"`. The run outcome is `Usage declined`, and the run id is the attempt uuid.
+
+When a charge exists, the notification payload includes `attempt_id`. The run row stores that uuid as `id`.
+
 ## Basic search
 
 ```ruby
@@ -50,7 +91,7 @@ Public keywords only. Unknown keywords raise `InvalidQueryError` before HTTP.
 | `freshness:` | none | `:day`, `:week`, `:month`, `:year`, or `YYYY-MM-DDtoYYYY-MM-DD` |
 | `extra_snippets:` | `false` | When true, extra excerpts land on `result.snippets` |
 
-Query text is a non-blank string, max 400 characters. There is no public `type:` in v1. Web search is the only operation.
+Query text is a non-blank string, max 400 characters. There is no public `type:` in v1. Web search is the only operation. `attribution:` is not one of these options. Pass it beside `provider:` when you charge the search.
 
 ## Response and results
 

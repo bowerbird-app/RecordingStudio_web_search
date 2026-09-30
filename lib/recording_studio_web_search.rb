@@ -3,6 +3,7 @@
 require "recording_studio"
 require "recording_studio_web_search/version"
 require "recording_studio_web_search/errors"
+require "recording_studio_web_search/usage"
 require "recording_studio_web_search/configuration"
 require "recording_studio_web_search/search_result"
 require "recording_studio_web_search/search_response"
@@ -35,6 +36,7 @@ module RecordingStudio
 
       def configure
         yield(configuration) if block_given?
+        configuration.validate_usage_meter!
       end
 
       def search(query, **)

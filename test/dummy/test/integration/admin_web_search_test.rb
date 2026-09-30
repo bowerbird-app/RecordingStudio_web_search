@@ -17,6 +17,8 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
 
   teardown do
     RecordingStudio::WebSearch.configuration.brave_api_key = @original_key
+    RecordingStudio::WebSearch.configuration.usage_handler = nil
+    RecordingStudio::WebSearch.configuration.usage_key_resolver = nil
   end
 
   test "admin root lists the web search section" do
@@ -123,6 +125,33 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Failures"
     assert_includes response.body, "status=failed"
+  end
+
+  test "a refused usage charge is stored as usage declined" do
+    configuration = RecordingStudio::WebSearch.configuration
+    configuration.brave_api_key = "test-brave-key"
+    configuration.usage_key_resolver = ->(provider:, **) { provider.to_s == "brave" ? "web.brave" : nil }
+    called = false
+    configuration.usage_handler = lambda do |**|
+      called = true
+      raise "credits exhausted"
+    end
+
+    error = nil
+    assert_difference -> { RecordingStudio::WebSearch::SearchRun.count }, 1 do
+      error = assert_raises(RuntimeError) do
+        RecordingStudio::WebSearch.search("billed houses")
+      end
+    end
+
+    run = RecordingStudio::WebSearch::SearchRun.order(:created_at).last
+    assert_equal "credits exhausted", error.message
+    assert_equal true, called
+    assert_equal "failed", run.status
+    assert_equal "Usage declined", run.outcome
+    assert_equal "billed houses", run.query
+    assert_match(/\A[0-9a-f-]{36}\z/, run.id)
+    assert_in_delta 0, run.estimated_cost_usd.to_f
   end
 
   test "a failed search is logged without storing a key" do

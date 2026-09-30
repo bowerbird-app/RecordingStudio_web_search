@@ -89,6 +89,7 @@ class RunLogTest < Minitest::Test
     outcomes = {
       "RecordingStudio::WebSearch::MissingApiKeyError" => "Needs a key",
       "RecordingStudio::WebSearch::ConfigurationError" => "Needs a key",
+      "RecordingStudio::WebSearch::Usage::ConfigurationError" => "Check usage",
       "RecordingStudio::WebSearch::AuthenticationError" => "Can't sign in",
       "RecordingStudio::WebSearch::RateLimitError" => "Too many requests",
       "RecordingStudio::WebSearch::TimeoutError" => "Timed out",
@@ -109,6 +110,46 @@ class RunLogTest < Minitest::Test
       assert_equal "failed", attributes[:status]
       assert_equal outcome, attributes[:outcome]
     end
+  end
+
+  def test_usage_declined_sets_outcome_and_attempt_id_without_extra_columns
+    attributes = RecordingStudio::WebSearch::RunLog.attributes(
+      success: false,
+      provider: :brave,
+      query: "houses",
+      estimated_cost_usd: 0,
+      parameters: {},
+      error_type: "RuntimeError",
+      error_category: "usage",
+      error_code: "usage_declined",
+      attempt_id: "11111111-1111-4111-8111-111111111111",
+      attribution: Object.new
+    )
+
+    assert_equal "failed", attributes[:status]
+    assert_equal "Usage declined", attributes[:outcome]
+    assert_equal "11111111-1111-4111-8111-111111111111", attributes[:id]
+    refute attributes.key?(:error_category)
+    refute attributes.key?(:error_code)
+    refute attributes.key?(:error_type)
+    refute attributes.key?(:attempt_id)
+    refute attributes.key?(:attribution)
+  end
+
+  def test_success_with_an_attempt_id_uses_that_row_id
+    attributes = RecordingStudio::WebSearch::RunLog.attributes(
+      success: true,
+      provider: :brave,
+      query: "houses",
+      estimated_cost_usd: 0.005,
+      parameters: {},
+      attempt_id: "22222222-2222-4222-8222-222222222222"
+    )
+
+    assert_equal "succeeded", attributes[:status]
+    assert_equal "Succeeded", attributes[:outcome]
+    assert_equal "22222222-2222-4222-8222-222222222222", attributes[:id]
+    refute attributes.key?(:attempt_id)
   end
 
   def test_record_does_nothing_without_a_rails_application

@@ -10,7 +10,7 @@ module WebSearchHttpStub
   end
 
   def stub_net_http(response: nil, error: nil)
-    captured = { calls: 0 }
+    captured = { calls: 0, order: [] }
     fake = Object.new
     fake.define_singleton_method(:use_ssl=) { |value| captured[:use_ssl] = value }
     fake.define_singleton_method(:verify_mode=) { |value| captured[:verify_mode] = value }
@@ -18,6 +18,7 @@ module WebSearchHttpStub
     fake.define_singleton_method(:read_timeout=) { |value| captured[:read_timeout] = value }
     fake.define_singleton_method(:write_timeout=) { |value| captured[:write_timeout] = value }
     fake.define_singleton_method(:request) do |request|
+      captured[:order] << :request
       captured[:calls] += 1
       captured[:request] = request
       raise error if error

@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioWebSearchTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.2.0", ::RecordingStudio::WebSearch::VERSION
+    assert_equal "0.3.0", ::RecordingStudio::WebSearch::VERSION
   end
 
   def test_engine_exists
@@ -19,6 +19,12 @@ class RecordingStudioWebSearchTest < Minitest::Test
     gemspec = File.read(File.expand_path("../recording_studio_web_search.gemspec", __dir__))
 
     assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
+  end
+
+  def test_gemspec_ships_upgrading_notes
+    spec = Gem::Specification.load(File.expand_path("../recording_studio_web_search.gemspec", __dir__))
+
+    assert_includes spec.files, "UPGRADING.md"
   end
 
   def test_gemspec_excludes_cursor_config
