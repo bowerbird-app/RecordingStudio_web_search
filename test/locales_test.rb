@@ -42,7 +42,6 @@ class LocalesTest < ActiveSupport::TestCase
     end
   end
 
-
   test "english run interface keys resolve without missing translations" do
     with_engine_locales_loaded do
       I18n.with_locale(:en) do
