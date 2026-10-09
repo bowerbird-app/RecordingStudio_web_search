@@ -28,6 +28,21 @@ class LocalesTest < ActiveSupport::TestCase
     assert_includes engine_locale_files, locale_path
   end
 
+  test "engine does not reappend locales to i18n load path" do
+    engine_paths = Dir[File.expand_path("../lib/**/engine.rb", __dir__)]
+    assert_predicate engine_paths, :any?
+
+    engine_paths.each do |path|
+      engine_source = File.read(path)
+
+      refute_includes engine_source, "i18n.load_path",
+                      "#{path} must not append app.config.i18n.load_path"
+      refute_includes engine_source, "I18n.load_path",
+                      "#{path} must not append I18n.load_path"
+    end
+  end
+
+
   test "english run interface keys resolve without missing translations" do
     with_engine_locales_loaded do
       I18n.with_locale(:en) do
