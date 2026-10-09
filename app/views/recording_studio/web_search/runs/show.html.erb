@@ -1,10 +1,10 @@
 <% recording_studio_page_nav(
      title: @run.query,
-     page_nav_back_label: "Searches",
+     page_nav_back_label: t("recording_studio.web_search.runs.searches"),
      page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
    ) %>
 <% recording_studio_page_nav_right do %>
-  <%= render FlatPack::Button::Component.new(text: "Searches", href: @back_url, style: :secondary) %>
+  <%= render FlatPack::Button::Component.new(text: t("recording_studio.web_search.runs.searches"), href: @back_url, style: :secondary) %>
 <% end %>
 
 <div class="flex w-full flex-col gap-6">

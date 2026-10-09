@@ -138,6 +138,10 @@ The dummy app installs Recording Studio AI at `/recording_studio_ai` and turns o
 
 Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree. Each run keeps a snapshot of title, URL, domain, and description, and the Brave key stays off the page.
 
+The run show page ships English interface copy under `recording_studio.web_search`
+in `config/locales/en.yml`. Hosts can override those keys. Admin screen and
+widget labels still live in Ruby for now.
+
 Mount admin on an admin root and grant Accessible access to that root. The Web search section links to Providers and Searches. Providers lists whoever can answer a search. Searches charts each day of the last 4 weeks, with filters for provider, dates, and status. The results count opens that run. Mount this engine so that page has a URL:
 
 ```ruby

@@ -241,8 +241,32 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Nothing turned up."
+    assert_includes response.body, "Searches"
     assert_select "a[href='#{anchor}']"
   end
+
+  test "search show page explains when pages were not kept" do
+    sign_in @user
+    run = RecordingStudio::WebSearch::SearchRun.create!(
+      provider: "brave",
+      query: "pages dropped",
+      status: "succeeded",
+      outcome: "Succeeded",
+      result_count: 3,
+      estimated_cost_usd: 0.005,
+      parameters: {},
+      results: []
+    )
+
+    get recording_studio_web_search.run_path(run)
+
+    assert_response :success
+    assert_includes response.body, "These pages were not kept."
+    assert_includes response.body, "Searches"
+    refute_includes response.body, "Nothing turned up."
+    refute_includes response.body, "Nothing came back."
+  end
+
 
   test "search show page requires an access grant" do
     run = RecordingStudio::WebSearch::SearchRun.create!(

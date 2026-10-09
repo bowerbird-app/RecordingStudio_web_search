@@ -1,0 +1,6 @@
+en:
+  recording_studio:
+    web_search:
+      runs:
+        empty:
+          pages_not_kept: "Host kept none of these pages."

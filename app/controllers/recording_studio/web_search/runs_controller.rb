@@ -33,10 +33,10 @@ module RecordingStudio
       end
 
       def empty_message
-        return "Nothing came back." unless @run.status == "succeeded"
-        return "Nothing turned up." if @run.result_count.to_i.zero?
+        return t("recording_studio.web_search.runs.empty.nothing_came_back") unless @run.status == "succeeded"
+        return t("recording_studio.web_search.runs.empty.nothing_turned_up") if @run.result_count.to_i.zero?
 
-        "These pages were not kept."
+        t("recording_studio.web_search.runs.empty.pages_not_kept")
       end
 
       def result_item_options(page)
