@@ -39,7 +39,6 @@ module RecordingStudio
         t("recording_studio.web_search.runs.empty.pages_not_kept")
       end
 
-
       def result_item_options(page)
         return { hover: false } if page["url"].blank?
 

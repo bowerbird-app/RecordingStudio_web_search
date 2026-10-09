@@ -20,28 +20,32 @@ class LocalesTest < ActiveSupport::TestCase
     assert_equal ["en.yml"], files.sort
   end
 
-  test "rails i18n load path includes the gem english locale file" do
-    locale_path = File.join(engine_locales_dir, "en.yml")
+  test "engine exposes config/locales for rails i18n load path" do
+    locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+    engine_locale_files = RecordingStudio::WebSearch::Engine.paths["config/locales"].existent
+                                                            .map { |path| File.expand_path(path) }
 
-    assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
+    assert_includes engine_locale_files, locale_path
   end
 
   test "english run interface keys resolve without missing translations" do
-    I18n.with_locale(:en) do
-      RUNS_KEYS.each do |key, english|
-        full_key = "recording_studio.web_search.runs.#{key}"
-        translation = I18n.t(full_key, default: nil)
+    with_engine_locales_loaded do
+      I18n.with_locale(:en) do
+        RUNS_KEYS.each do |key, english|
+          full_key = "recording_studio.web_search.runs.#{key}"
+          translation = I18n.t(full_key, default: nil)
 
-        assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
-        assert_equal english, I18n.t(full_key, raise: true)
-      end
+          assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
+          assert_equal english, I18n.t(full_key, raise: true)
+        end
 
-      EMPTY_KEYS.each do |key, english|
-        full_key = "recording_studio.web_search.runs.empty.#{key}"
-        translation = I18n.t(full_key, default: nil)
+        EMPTY_KEYS.each do |key, english|
+          full_key = "recording_studio.web_search.runs.empty.#{key}"
+          translation = I18n.t(full_key, default: nil)
 
-        assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
-        assert_equal english, I18n.t(full_key, raise: true)
+          assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
+          assert_equal english, I18n.t(full_key, raise: true)
+        end
       end
     end
   end
@@ -64,5 +68,17 @@ class LocalesTest < ActiveSupport::TestCase
 
   def locale_tree(path, locale)
     YAML.safe_load_file(path, aliases: true).fetch(locale)
+  end
+
+  def with_engine_locales_loaded
+    locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+    original_load_path = I18n.load_path.dup
+
+    I18n.load_path |= [locale_path]
+    I18n.reload!
+    yield
+  ensure
+    I18n.load_path.replace(original_load_path)
+    I18n.reload!
   end
 end
