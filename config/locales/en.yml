@@ -1,0 +1,9 @@
+en:
+  recording_studio:
+    web_search:
+      runs:
+        searches: "Searches"
+        empty:
+          nothing_came_back: "Nothing came back."
+          nothing_turned_up: "Nothing turned up."
+          pages_not_kept: "These pages were not kept."
