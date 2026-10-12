@@ -7,3 +7,28 @@ en:
           nothing_came_back: "Nothing came back."
           nothing_turned_up: "Nothing turned up."
           pages_not_kept: "These pages were not kept."
+      admin:
+        section:
+          title: "Web search"
+          subtitle: "See who searches, what failed, and what it cost."
+        links:
+          view_providers: "View providers"
+          view_searches: "View searches"
+        screens:
+          providers:
+            title: "Providers"
+          searches:
+            title: "Searches"
+        summary:
+          searches: "Searches"
+        chart:
+          searches_title: "Searches"
+          searches_series: "Searches"
+          failures_series: "Failures"
+        widgets:
+          providers:
+            title: "Providers"
+            info: "Brave is ready when the server has a key. This page never shows the key."
+          failures:
+            title: "Failures"
+            info: "Searches that did not come back."

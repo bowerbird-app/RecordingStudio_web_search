@@ -1,0 +1,11 @@
+# Host nested override for a rarely shown key (failures widget info tooltip).
+# Loaded by Rails from config/locales — do not append this path in tests.
+# Common visible labels (section title, links, Providers/Failures titles) stay
+# on gem English.
+en:
+  recording_studio:
+    web_search:
+      admin:
+        widgets:
+          failures:
+            info: "HOST searches that did not come back."

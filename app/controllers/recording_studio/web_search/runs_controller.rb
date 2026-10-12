@@ -33,11 +33,25 @@ module RecordingStudio
       end
 
       def empty_message
-        return t("recording_studio.web_search.runs.empty.nothing_came_back") unless @run.status == "succeeded"
-        return t("recording_studio.web_search.runs.empty.nothing_turned_up") if @run.result_count.to_i.zero?
+        unless @run.status == "succeeded"
+          return t(
+            "recording_studio.web_search.runs.empty.nothing_came_back",
+            default: "Nothing came back."
+          )
+        end
+        if @run.result_count.to_i.zero?
+          return t(
+            "recording_studio.web_search.runs.empty.nothing_turned_up",
+            default: "Nothing turned up."
+          )
+        end
 
-        t("recording_studio.web_search.runs.empty.pages_not_kept")
+        t(
+          "recording_studio.web_search.runs.empty.pages_not_kept",
+          default: "These pages were not kept."
+        )
       end
+
 
       def result_item_options(page)
         return { hover: false } if page["url"].blank?
