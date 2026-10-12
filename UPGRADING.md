@@ -1,6 +1,53 @@
 # Upgrading
 
+## 0.5.0
+
+This is a non-breaking upgrade. Rendered English interface text stays
+byte-identical to `0.4.0`.
+
+### What Changed
+
+- Admin DSL chrome in `lib/recording_studio_web_search/admin.rb` (section
+  title/subtitle, screen titles, widget titles/info, link text, summary label,
+  chart titles/series names) resolves through
+  `RecordingStudio::WebSearch::Copy.t(..., default: …)`.
+- Every run-show `t(...)` lookup now passes an English `default:`.
+- Boot-order host override under
+  `test/dummy/config/locales/recording_studio_web_search_host.en.yml` covers the
+  rarely shown failures-widget info key.
+
+Keys added (under `recording_studio.web_search`):
+
+| Key | English |
+| --- | --- |
+| `admin.section.title` | Web search |
+| `admin.section.subtitle` | See who searches, what failed, and what it cost. |
+| `admin.links.view_providers` | View providers |
+| `admin.links.view_searches` | View searches |
+| `admin.screens.providers.title` | Providers |
+| `admin.screens.searches.title` | Searches |
+| `admin.summary.searches` | Searches |
+| `admin.chart.searches_title` | Searches |
+| `admin.chart.searches_series` | Searches |
+| `admin.chart.failures_series` | Failures |
+| `admin.widgets.providers.title` | Providers |
+| `admin.widgets.providers.info` | Brave is ready when the server has a key. This page never shows the key. |
+| `admin.widgets.failures.title` | Failures |
+| `admin.widgets.failures.info` | Searches that did not come back. |
+
+Left untranslated on purpose: Admin screen subtitles and table title (`Log`)
+(Admin search/resolvers read those fields raw), Admin column headers and cell
+values (including `None`, stored run outcomes, provider Ready/Needs a key),
+AI tool `DEFINITION` strings, RunLog/Usage outcome constants, exception
+messages, generator CLI text, icon/style tokens, and dummy app views.
+
+### Upgrade Steps
+
+No migration is required. English hosts need no change. To override or add
+another language, set the keys above in the host's `config/locales`.
+
 ## 0.4.0
+
 
 This is a non-breaking upgrade. Rendered English interface text on the search run
 show page is unchanged.

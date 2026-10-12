@@ -2,6 +2,7 @@
 
 require "recording_studio"
 require "recording_studio_web_search/version"
+require "recording_studio_web_search/copy"
 require "recording_studio_web_search/errors"
 require "recording_studio_web_search/usage"
 require "recording_studio_web_search/configuration"

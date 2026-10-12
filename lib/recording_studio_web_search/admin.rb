@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio_web_search/provider_catalog"
+require "recording_studio_web_search/copy"
 
 module RecordingStudio
   module WebSearch
@@ -18,7 +19,8 @@ module RecordingStudio
       class ProvidersScreen < RecordingStudioAdmin::Screen
         key "web_search_providers"
         icon :document_text
-        title "Providers"
+        title { Copy.t("admin.screens.providers.title", default: "Providers") }
+        # Keep as a literal: Admin search reads screen subtitle raw (not evaluate).
         subtitle "Who can answer a search."
         blast_radius :site
         query { |_context| ProviderCatalog.relation }
@@ -36,7 +38,8 @@ module RecordingStudio
       class SearchesScreen < RecordingStudioAdmin::Screen
         key "web_search_runs"
         icon :magnifying_glass
-        title "Searches"
+        title { Copy.t("admin.screens.searches.title", default: "Searches") }
+        # Keep as a literal: Admin search reads screen subtitle raw (not evaluate).
         subtitle "Every search that left this app."
         blast_radius :site
         query { |_context| SearchRun.order(created_at: :desc) }
@@ -47,21 +50,25 @@ module RecordingStudio
         filter :status, options: %w[succeeded failed]
 
         summary do
-          label "Searches"
+          label ->(_context) { Copy.t("admin.summary.searches", default: "Searches") }
           value { |context| SearchesScreen.search_count(context.query_result.relation) }
           hide_change
           hide_period
         end
 
         chart do
-          title "Searches"
+          title { Copy.t("admin.chart.searches_title", default: "Searches") }
           type :line
           series do |context|
-            [{ name: "Searches", data: SearchesScreen.search_series(context) }]
+            [{
+              name: Copy.t("admin.chart.searches_series", default: "Searches"),
+              data: SearchesScreen.search_series(context)
+            }]
           end
         end
 
         table do
+          # Keep as a literal: table title is read raw (not evaluate).
           title "Log"
           filter :search, apply: lambda { |relation, value, _context|
             next relation if value.blank?
@@ -110,8 +117,13 @@ module RecordingStudio
 
       ProvidersWidget = RecordingStudioAdmin::Widget.new("widgets.web_search.providers", blast_radius: :site) do
         type :list
-        title "Providers"
-        info "Brave is ready when the server has a key. This page never shows the key."
+        title { Copy.t("admin.widgets.providers.title", default: "Providers") }
+        info do
+          Copy.t(
+            "admin.widgets.providers.info",
+            default: "Brave is ready when the server has a key. This page never shows the key."
+          )
+        end
         list_options divider: true, hover: true
         items do |context|
           ProviderCatalog.rows.map do |row|
@@ -126,14 +138,17 @@ module RecordingStudio
 
       FailuresWidget = RecordingStudioAdmin::Widget.new("widgets.web_search.failures", blast_radius: :site) do
         type :chart
-        title "Failures"
-        info "Searches that did not come back."
+        title { Copy.t("admin.widgets.failures.title", default: "Failures") }
+        info { Copy.t("admin.widgets.failures.info", default: "Searches that did not come back.") }
         chart_type :bar
         value do |context|
           FailureSeries.failed_relation(context).count
         end
         series do |context|
-          [{ name: "Failures", data: FailureSeries.series_for(context) }]
+          [{
+            name: Copy.t("admin.chart.failures_series", default: "Failures"),
+            data: FailureSeries.series_for(context)
+          }]
         end
         chart_options({ height: 220 })
         link_to { |context| RecordingStudio::WebSearch::Admin.screen_href(context, "web_search_runs", "status=failed") }
@@ -254,16 +269,18 @@ module RecordingStudio
       class WebSearchSection < RecordingStudioAdmin::Section
         key "web_search"
         icon :magnifying_glass
-        title "Web search"
-        subtitle "See who searches, what failed, and what it cost."
+        title { Copy.t("admin.section.title", default: "Web search") }
+        subtitle do
+          Copy.t("admin.section.subtitle", default: "See who searches, what failed, and what it cost.")
+        end
         blast_radius :site
 
         link :providers,
-             text: "View providers",
+             text: ->(_context) { Copy.t("admin.links.view_providers", default: "View providers") },
              url: ->(context) { context.admin_screen_path("web_search_providers") },
              style: :secondary
         link :searches,
-             text: "View searches",
+             text: ->(_context) { Copy.t("admin.links.view_searches", default: "View searches") },
              url: ->(context) { context.admin_screen_path("web_search_runs") },
              style: :secondary
 
