@@ -33,25 +33,16 @@ module RecordingStudio
       end
 
       def empty_message
-        unless @run.status == "succeeded"
-          return t(
-            "recording_studio.web_search.runs.empty.nothing_came_back",
-            default: "Nothing came back."
-          )
-        end
-        if @run.result_count.to_i.zero?
-          return t(
-            "recording_studio.web_search.runs.empty.nothing_turned_up",
-            default: "Nothing turned up."
-          )
-        end
-
-        t(
-          "recording_studio.web_search.runs.empty.pages_not_kept",
-          default: "These pages were not kept."
-        )
+        key, english = empty_message_entry
+        t("recording_studio.web_search.runs.empty.#{key}", default: english)
       end
 
+      def empty_message_entry
+        return ["nothing_came_back", "Nothing came back."] unless @run.status == "succeeded"
+        return ["nothing_turned_up", "Nothing turned up."] if @run.result_count.to_i.zero?
+
+        ["pages_not_kept", "These pages were not kept."]
+      end
 
       def result_item_options(page)
         return { hover: false } if page["url"].blank?
