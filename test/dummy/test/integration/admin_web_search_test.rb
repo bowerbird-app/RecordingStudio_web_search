@@ -263,8 +263,34 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "These pages were not kept."
     assert_includes response.body, "Searches"
+    assert_select "h1", text: "pages dropped"
     refute_includes response.body, "Nothing turned up."
     refute_includes response.body, "Nothing came back."
+  end
+
+  test "search show heading escapes a script tag and an apostrophe once" do
+    sign_in @user
+    query = "We'll <script>alert(1)</script>"
+    run = RecordingStudio::WebSearch::SearchRun.create!(
+      provider: "brave",
+      query: query,
+      status: "succeeded",
+      outcome: "Succeeded",
+      result_count: 0,
+      estimated_cost_usd: 0,
+      parameters: {},
+      results: []
+    )
+
+    get recording_studio_web_search.run_path(run)
+
+    assert_response :success
+    assert_select "h1", text: query
+    escaped = "We&#39;ll &lt;script&gt;alert(1)&lt;/script&gt;"
+    assert_equal 1, response.body.scan(escaped).size
+    refute_includes response.body, "We&amp;#39;"
+    refute_includes response.body, "&amp;lt;script"
+    refute_includes response.body, "<script>alert(1)</script>"
   end
 
 

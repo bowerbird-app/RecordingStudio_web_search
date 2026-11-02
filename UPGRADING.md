@@ -1,5 +1,46 @@
 # Upgrading
 
+## 0.6.0
+
+This release requires Recording Studio 6.1.0 or newer. Search, usage metering,
+and admin screens keep the same behavior. There is no migration in this gem.
+
+### What Changed
+
+- The gemspec depends on `recording_studio` `~> 6.1` (6.1 up to, but not including, 7).
+- The run show page renders `FlatPack::PageTitle` with the plain query and
+  subtitle. Core 6's default layout strips `content_for :title` and then
+  escapes that string again, so the query is not passed through that slot.
+  The page calls `flat_pack_page_nav` for the back control and the close
+  anchor. The close anchor defaults to the admin surface path. The results
+  sit in `FlatPack::Stack` with `gap: :lg`. `recording_studio_page_nav` is
+  gone in core 6. The Searches action still uses `recording_studio_page_nav_right`.
+- The dummy app opts into the default layout with
+  `helper RecordingStudio::LayoutHelper` and
+  `layout "recording_studio/default_layout"`.
+  `RecordingStudio::UsesDefaultLayout` is gone in core 6.
+- Dummy Admin sets `config.layout` and `surface.layout`. `engine_layout` is
+  gone in Admin 2.8. Dummy Root Switchable sets `config.layout` to the layout
+  name. A symbol is not a layout setting in core 6.
+- Flatpack cards take `background:` instead of `style:`.
+
+### Upgrade Steps
+
+Install Recording Studio 6.1.0 or newer. Core 6 depends on Flatpack
+`>= 0.1.315`, which is not on RubyGems. Pin it from GitHub. This repo uses
+tag `v0.1.332`:
+
+```ruby
+gem "recording_studio", git: "https://github.com/bowerbird-app/RecordingStudio.git", tag: "v6.3.0"
+gem "flat_pack", git: "https://github.com/bowerbird-app/flatpack.git", tag: "v0.1.332"
+```
+
+Hosts that mount Admin or AI with this dummy's addon set also need Logs
+`v0.7.1`. This gem does not depend on Logs, Admin, or AI.
+
+No migration. Run `bin/rails generate recording_studio_web_search:migrations`
+only if the host has not already copied the search-run table.
+
 ## 0.5.0
 
 This is a non-breaking upgrade. Rendered English interface text stays

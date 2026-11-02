@@ -1,9 +1,5 @@
-<% recording_studio_page_nav(title: "Admin", page_nav_back_url: main_app.root_path, page_nav_back_label: "Home") %>
-
-<%= render FlatPack::PageTitle::Component.new(
-  title: "Admin",
-  subtitle: "Staff tools for this site."
-) %>
+<%= render FlatPack::PageTitle::Component.new(title: "Admin", subtitle: "Staff tools for this site.") %>
+<% flat_pack_page_nav(round: true, style: :default, back_href: main_app.root_path, back_tooltip: "Home") %>
 
 <% if @admin_sections.any? %>
   <%= render FlatPack::List::Component.new(divider: true) do %>
