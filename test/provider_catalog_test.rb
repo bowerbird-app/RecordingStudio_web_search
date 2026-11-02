@@ -3,16 +3,15 @@
 require "test_helper"
 
 class ProviderCatalogTest < Minitest::Test
+  include WebSearchConfigurationIsolation
+
   def setup
-    @original = RecordingStudio::WebSearch.instance_variable_get(:@configuration)
-    RecordingStudio::WebSearch.instance_variable_set(
-      :@configuration,
-      RecordingStudio::WebSearch::Configuration.new
-    )
+    @original = snapshot_web_search_configuration
+    reset_web_search_configuration_to_defaults
   end
 
   def teardown
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, @original)
+    restore_web_search_configuration(@original)
   end
 
   def test_lists_each_configured_provider

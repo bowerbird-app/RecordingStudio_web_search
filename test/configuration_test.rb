@@ -3,6 +3,8 @@
 require "test_helper"
 
 class ConfigurationTest < Minitest::Test
+  include WebSearchConfigurationIsolation
+
   def setup
     @configuration = RecordingStudio::WebSearch::Configuration.new
   end
@@ -156,12 +158,17 @@ class ConfigurationTest < Minitest::Test
     assert_equal "usage_key_resolver must respond to call", error.message
   end
 
+  def test_configuration_isolation_tracks_every_public_writer
+    writers = RecordingStudio::WebSearch::Configuration.public_instance_methods(false).grep(/=\z/)
+    fields = writers.map { |name| name.to_s.delete_suffix("=").to_sym }.sort
+
+    assert_equal fields, WebSearchConfigurationIsolation.writable_fields
+    refute_includes fields, :hooks
+  end
+
   def test_configure_rejects_a_handler_without_a_resolver
-    original = RecordingStudio::WebSearch.instance_variable_get(:@configuration)
-    RecordingStudio::WebSearch.instance_variable_set(
-      :@configuration,
-      RecordingStudio::WebSearch::Configuration.new
-    )
+    original = snapshot_web_search_configuration
+    reset_web_search_configuration_to_defaults
 
     error = assert_raises(RecordingStudio::WebSearch::Usage::ConfigurationError) do
       RecordingStudio::WebSearch.configure do |config|
@@ -171,6 +178,6 @@ class ConfigurationTest < Minitest::Test
 
     assert_equal "usage_handler requires a usage_key_resolver that responds to call", error.message
   ensure
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, original)
+    restore_web_search_configuration(original)
   end
 end

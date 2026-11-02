@@ -4,10 +4,11 @@ require "test_helper"
 
 class SearchTest < Minitest::Test
   include WebSearchHttpStub
+  include WebSearchConfigurationIsolation
 
   def setup
-    @original = RecordingStudio::WebSearch.instance_variable_get(:@configuration)
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, RecordingStudio::WebSearch::Configuration.new)
+    @original = snapshot_web_search_configuration
+    reset_web_search_configuration_to_defaults
     RecordingStudio::WebSearch.configuration.brave_api_key = "test-brave-key"
     @events = []
     @subscriber = ActiveSupport::Notifications.subscribe("search.recording_studio_web_search") do |*args|
@@ -17,7 +18,7 @@ class SearchTest < Minitest::Test
 
   def teardown
     ActiveSupport::Notifications.unsubscribe(@subscriber)
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, @original)
+    restore_web_search_configuration(@original)
   end
 
   def test_search_returns_literal_result_fields
