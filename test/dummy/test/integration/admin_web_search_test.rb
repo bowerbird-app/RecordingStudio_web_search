@@ -263,8 +263,46 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "These pages were not kept."
     assert_includes response.body, "Searches"
+    assert_select "h1", text: "pages dropped"
     refute_includes response.body, "Nothing turned up."
     refute_includes response.body, "Nothing came back."
+  end
+
+  test "search show heading keeps an apostrophe" do
+    sign_in @user
+    run = RecordingStudio::WebSearch::SearchRun.create!(
+      provider: "brave",
+      query: "We'll look",
+      status: "succeeded",
+      outcome: "Succeeded",
+      result_count: 0,
+      estimated_cost_usd: 0,
+      parameters: {},
+      results: []
+    )
+
+    get recording_studio_web_search.run_path(run)
+
+    assert_response :success
+    assert_select "h1", text: "We'll look"
+    refute_includes response.body, "We&amp;#39;"
+
+    tagged = RecordingStudio::WebSearch::SearchRun.create!(
+      provider: "brave",
+      query: "<script>alert(1)</script>",
+      status: "succeeded",
+      outcome: "Succeeded",
+      result_count: 0,
+      estimated_cost_usd: 0,
+      parameters: {},
+      results: []
+    )
+
+    get recording_studio_web_search.run_path(tagged)
+
+    assert_response :success
+    assert_select "h1", text: "<script>alert(1)</script>"
+    refute_includes response.body, "<script>alert(1)</script>"
   end
 
 

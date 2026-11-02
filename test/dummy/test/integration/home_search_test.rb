@@ -42,6 +42,9 @@ class HomeSearchTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Query"
     assert_includes response.body, "Provider"
     assert_includes response.body, "Search"
+    assert_select "h1", text: "Web search"
+    assert_select "p", text: "Type a question. We'll fetch public pages."
+    refute_includes response.body, "We&amp;#39;"
     refute called
     refute_includes response.body, "Brave API key is missing"
   end

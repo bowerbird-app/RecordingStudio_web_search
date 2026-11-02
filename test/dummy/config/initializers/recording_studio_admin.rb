@@ -19,7 +19,7 @@ end
 
 RecordingStudioAdmin.configure do |config|
   config.default_mount_path = "/admin"
-  config.engine_layout = "recording_studio/default_layout"
+  config.layout = "recording_studio/default_layout"
   config.authentication_method = :authenticate_user!
   config.current_actor_method = :current_user
 
@@ -31,6 +31,6 @@ RecordingStudioAdmin.configure do |config|
 
   config.surface(:admin) do |surface|
     surface.root_section :web_search
-    surface.engine_layout = "recording_studio/default_layout"
+    surface.layout = "recording_studio/default_layout"
   end
 end
