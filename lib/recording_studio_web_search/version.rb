@@ -2,6 +2,6 @@
 
 module RecordingStudio
   module WebSearch
-    VERSION = "0.5.0"
+    VERSION = "0.5.3"
   end
 end

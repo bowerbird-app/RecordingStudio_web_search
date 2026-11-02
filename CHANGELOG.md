@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-11-02
+
+### Changed
+
+* Version `0.5.0` → `0.5.3` so `VERSION`, CHANGELOG, and the existing `v0.5.2` tag line up. Tags `v0.5.1` and `v0.5.2` already existed on main with no matching `VERSION` bump.
+* Stop tracking SimpleCov output under `coverage/` and `test/dummy/coverage/`.
+* Non-matrix GitHub Actions `ruby/setup-ruby` steps pin `ruby-version: '3.3'` so Security jobs boot on current ubuntu runners. Matrix test jobs still use `3.3` and `3.4`. The `.ruby-version` file is unchanged.
+
+### Upgrade notes
+
+- No migration or host code change is required.
+
+## [0.5.2] - 2026-10-16
+
+### Changed
+
+* Dummy dependency bumps already tagged as `v0.5.2`: Recording Studio Trashable `v0.11.0` (#25) and Accessible `v0.18.0` (#24). `VERSION` in the gem stayed `0.5.0` on that tag.
+
+## [0.5.1] - 2026-10-14
+
+### Changed
+
+* Dummy dependency bumps already tagged as `v0.5.1`: Recording Studio `v4.6.0` (#23), Accessible `v0.17.0` (#22), Admin `v2.3.0` (#21) and `v2.2.0` (#18), AI `v0.11.0` (#20), and Root Switchable `v0.9.0` (#19). `VERSION` in the gem stayed `0.5.0` on that tag.
+
 ## [0.5.0] - 2026-10-12
 
 ### Added
@@ -85,7 +109,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.3...HEAD
+[0.5.3]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.2.0...v0.3.0
