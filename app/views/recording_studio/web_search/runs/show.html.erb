@@ -23,12 +23,12 @@
     <%= render FlatPack::List::Component.new(divider: true) do %>
       <% @pages.each do |page| %>
         <%= render FlatPack::List::Item.new(**result_item_options(page)) do %>
-          <span class="block font-semibold"><%= page["title"] %></span>
+          <%= render FlatPack::Text::Component.new(text: page["title"].to_s, as: :div, weight: :semibold) %>
           <% if page["domain"].present? %>
-            <span class="block text-sm text-(--surface-muted-content-color)"><%= page["domain"] %></span>
+            <%= render FlatPack::Text::Component.new(text: page["domain"].to_s, as: :div, size: :sm, style: :muted) %>
           <% end %>
           <% if page["description"].present? %>
-            <span class="mt-1 block text-sm leading-6"><%= page["description"] %></span>
+            <%= render FlatPack::Text::Component.new(text: page["description"].to_s, as: :p, size: :sm, class: "mt-1 leading-6") %>
           <% end %>
         <% end %>
       <% end %>

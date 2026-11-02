@@ -136,7 +136,7 @@ The dummy app installs Recording Studio AI at `/recording_studio_ai` and turns o
 
 ## Admin
 
-Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree. Each run keeps a snapshot of title, URL, domain, and description, and the Brave key stays off the page.
+Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree. Each run keeps a snapshot of title, URL, domain, and description, and the Brave key stays off the page. The run show page draws those fields with `FlatPack::Text`. Hosts that render that page need Flatpack `>= 0.1.331`. This gem does not add a gemspec `flat_pack` dependency.
 
 The run show page and Admin DSL chrome (section/screen titles, widget
 titles/info, link text, summary and chart labels) ship English interface copy

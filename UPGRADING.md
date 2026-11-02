@@ -1,5 +1,27 @@
 # Upgrading
 
+## 0.6.1
+
+This release needs Flatpack `>= 0.1.331` for the run show result copy. Search
+and admin behavior is unchanged. There is no migration.
+
+### What Changed
+
+- Title, domain, and description on a saved search run render through
+  `FlatPack::Text` (`as: :div` for title and domain, `as: :p` for description).
+- The gemspec still does not add `flat_pack`. Hosts that mount the run page
+  already need Flatpack from Recording Studio 6.
+
+### Upgrade Steps
+
+Keep Flatpack at `>= 0.1.331`. This repo pins `v0.1.332`:
+
+```ruby
+gem "flat_pack", git: "https://github.com/bowerbird-app/flatpack.git", tag: "v0.1.332"
+```
+
+No migration.
+
 ## 0.6.0
 
 This release requires Recording Studio 6.1.0 or newer. Search, usage metering,
