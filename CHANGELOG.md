@@ -17,8 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Admin `v2.8.1`, AI `v0.19.5`, Root Switchable `v0.11.3`, Metrics `v0.7.0`,
   Trashable `v0.12.0`, Cache `v0.6.0`, and Logs `v0.7.1`. Logs is a dummy pin
   because Admin 2.8 and AI 0.19 depend on it and it is not on RubyGems.
-* The constant moves from `0.5.0` to `0.6.0`. Tags `v0.5.1` and `v0.5.2` shipped
-  without a version bump.
+* The constant moves from `0.5.3` to `0.6.0`.
 
 ### Upgrade notes
 
@@ -38,6 +37,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   uses the layout name `recording_studio/default_layout`. Flatpack cards use
   `background:` instead of `style:`.
 - See [UPGRADING.md](UPGRADING.md#060).
+
+## [0.5.3] - 2026-11-02
+
+### Changed
+
+* Version `0.5.0` → `0.5.3` so `VERSION`, CHANGELOG, and the existing `v0.5.2` tag line up. Tags `v0.5.1` and `v0.5.2` already existed on main with no matching `VERSION` bump.
+* Stop tracking SimpleCov output under `coverage/` and `test/dummy/coverage/`.
+* Non-matrix GitHub Actions `ruby/setup-ruby` steps pin `ruby-version: '3.3'` so Security jobs boot on current ubuntu runners. Matrix test jobs still use `3.3` and `3.4`. The `.ruby-version` file is unchanged.
+
+### Upgrade notes
+
+- No migration or host code change is required.
+
+## [0.5.2] - 2026-10-16
+
+### Changed
+
+* Dummy dependency bumps already tagged as `v0.5.2`: Recording Studio Trashable `v0.11.0` (#25) and Accessible `v0.18.0` (#24). `VERSION` in the gem stayed `0.5.0` on that tag.
+
+## [0.5.1] - 2026-10-14
+
+### Changed
+
+* Dummy dependency bumps already tagged as `v0.5.1`: Recording Studio `v4.6.0` (#23), Accessible `v0.17.0` (#22), Admin `v2.3.0` (#21) and `v2.2.0` (#18), AI `v0.11.0` (#20), and Root Switchable `v0.9.0` (#19). `VERSION` in the gem stayed `0.5.0` on that tag.
 
 ## [0.5.0] - 2026-10-12
 
@@ -118,7 +141,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search log keeps a page snapshot, and the results count opens that run
 
 [Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.2...v0.6.0
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.3...v0.6.0
+[0.5.3]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.2.0...v0.3.0

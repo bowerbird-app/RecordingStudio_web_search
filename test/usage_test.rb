@@ -4,12 +4,13 @@ require "test_helper"
 
 class UsageTest < Minitest::Test
   include WebSearchHttpStub
+  include WebSearchConfigurationIsolation
 
   ATTEMPT_KEY = /\Aweb-search-attempt:[0-9a-f-]{36}\z/
 
   def setup
-    @original = RecordingStudio::WebSearch.instance_variable_get(:@configuration)
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, RecordingStudio::WebSearch::Configuration.new)
+    @original = snapshot_web_search_configuration
+    reset_web_search_configuration_to_defaults
     RecordingStudio::WebSearch.configuration.brave_api_key = "test-brave-key"
     @events = []
     @subscriber = ActiveSupport::Notifications.subscribe("search.recording_studio_web_search") do |*args|
@@ -24,7 +25,7 @@ class UsageTest < Minitest::Test
 
   def teardown
     ActiveSupport::Notifications.unsubscribe(@subscriber)
-    RecordingStudio::WebSearch.instance_variable_set(:@configuration, @original)
+    restore_web_search_configuration(@original)
   end
 
   def test_search_without_a_handler_skips_the_resolver
