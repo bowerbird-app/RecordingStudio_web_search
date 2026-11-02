@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Require `recording_studio` `>= 6.1.0`. The gemspec no longer accepts 4.x.
+* Require `recording_studio` `~> 6.1` (6.1 up to, but not including, 7). The gemspec no longer accepts 4.x.
 * Development pins: Recording Studio `v6.3.0` and Flatpack `v0.1.332`.
 * Dummy pins move to the current core-6 addon tags: Accessible `v0.24.0`,
   Admin `v2.8.1`, AI `v0.19.5`, Root Switchable `v0.11.3`, Metrics `v0.7.0`,
@@ -28,8 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the same behavior.
 - Core 6 removed `recording_studio_page_nav` and
   `RecordingStudio::UsesDefaultLayout`. The run show page and the dummy shell
-  call `flat_pack_page_nav` and `recording_studio_page_nav_right`. Headings
-  use `content_for :title` and `:subtitle`, which the default layout draws.
+  call `flat_pack_page_nav` and `recording_studio_page_nav_right`. The run
+  page draws `FlatPack::PageTitle` with the plain query. The default layout
+  strips `content_for :title` and then escapes it again, so that slot is not
+  used for the query and the query is never marked `html_safe`. The results
+  column is `FlatPack::Stack` with `gap: :lg`. The close anchor defaults to
+  `RecordingStudioAdmin.configuration.surface_for(:admin).path`.
 - Dummy Admin uses `layout` instead of `engine_layout`. Dummy Root Switchable
   uses the layout name `recording_studio/default_layout`. Flatpack cards use
   `background:` instead of `style:`.

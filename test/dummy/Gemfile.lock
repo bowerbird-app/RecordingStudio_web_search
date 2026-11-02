@@ -115,7 +115,7 @@ PATH
   specs:
     recording_studio_web_search (0.6.0)
       rails (~> 8.1.0)
-      recording_studio (>= 6.1.0)
+      recording_studio (~> 6.1)
 
 GEM
   remote: https://rubygems.org/

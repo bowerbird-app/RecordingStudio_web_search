@@ -18,8 +18,27 @@ class RecordingStudioWebSearchTest < Minitest::Test
   def test_gemspec_requires_recording_studio_6_1
     gemspec = File.read(File.expand_path("../recording_studio_web_search.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.1"'
     refute_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
+    refute_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.1.0"'
+  end
+
+  def test_run_show_renders_the_query_without_marking_it_safe
+    view = File.read(File.expand_path("../app/views/recording_studio/web_search/runs/show.html.erb", __dir__))
+    helper = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+    admin_root = File.read(File.expand_path("dummy/app/views/admin/root/show.html.erb", __dir__))
+
+    assert_includes view, "FlatPack::PageTitle::Component.new(title: @run.query.to_s, subtitle: @subtitle.presence)"
+    assert_includes view, "FlatPack::Stack::Component.new(gap: :lg)"
+    assert_includes view, "RecordingStudioAdmin.configuration.surface_for(:admin).path"
+    refute_includes view, "html_safe"
+    refute_includes view, "content_for :title"
+    refute_includes view, "default_mount_path"
+    refute_includes view, "flex w-full flex-col"
+    refute_includes helper, "html_safe"
+    refute_includes helper, "content_for(:title"
+    refute_includes admin_root, "html_safe"
+    refute_includes admin_root, "content_for :title"
   end
 
   def test_gemspec_ships_upgrading_notes

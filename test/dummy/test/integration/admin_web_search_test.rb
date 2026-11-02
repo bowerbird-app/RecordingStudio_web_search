@@ -268,11 +268,12 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Nothing came back."
   end
 
-  test "search show heading keeps an apostrophe" do
+  test "search show heading escapes a script tag and an apostrophe once" do
     sign_in @user
+    query = "We'll <script>alert(1)</script>"
     run = RecordingStudio::WebSearch::SearchRun.create!(
       provider: "brave",
-      query: "We'll look",
+      query: query,
       status: "succeeded",
       outcome: "Succeeded",
       result_count: 0,
@@ -284,24 +285,11 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     get recording_studio_web_search.run_path(run)
 
     assert_response :success
-    assert_select "h1", text: "We'll look"
+    assert_select "h1", text: query
+    escaped = "We&#39;ll &lt;script&gt;alert(1)&lt;/script&gt;"
+    assert_equal 1, response.body.scan(escaped).size
     refute_includes response.body, "We&amp;#39;"
-
-    tagged = RecordingStudio::WebSearch::SearchRun.create!(
-      provider: "brave",
-      query: "<script>alert(1)</script>",
-      status: "succeeded",
-      outcome: "Succeeded",
-      result_count: 0,
-      estimated_cost_usd: 0,
-      parameters: {},
-      results: []
-    )
-
-    get recording_studio_web_search.run_path(tagged)
-
-    assert_response :success
-    assert_select "h1", text: "<script>alert(1)</script>"
+    refute_includes response.body, "&amp;lt;script"
     refute_includes response.body, "<script>alert(1)</script>"
   end
 

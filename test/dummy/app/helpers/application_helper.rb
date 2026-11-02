@@ -1,9 +1,12 @@
 module ApplicationHelper
   def dummy_page_nav(title:, subtitle: nil, back_url: nil, back_label: "Home")
-    # The default layout strips these slots, which drops html safety, then
-    # PageTitle escapes again. Store the raw characters so that escape happens once.
-    content_for(:title, title.to_s.html_safe) if title.present?
-    content_for(:subtitle, subtitle.to_s.html_safe) if subtitle.present?
+    # The default layout strips content_for :title, then PageTitle escapes it
+    # again. Draw the heading here so the plain string is escaped once.
+    if title.present?
+      concat render(
+        FlatPack::PageTitle::Component.new(title: title.to_s, subtitle: subtitle.presence&.to_s)
+      )
+    end
     flat_pack_page_nav(
       round: true,
       style: :default,

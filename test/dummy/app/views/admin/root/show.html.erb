@@ -1,5 +1,4 @@
-<% content_for :title, "Admin".html_safe %>
-<% content_for :subtitle, "Staff tools for this site.".html_safe %>
+<%= render FlatPack::PageTitle::Component.new(title: "Admin", subtitle: "Staff tools for this site.") %>
 <% flat_pack_page_nav(round: true, style: :default, back_href: main_app.root_path, back_tooltip: "Home") %>
 
 <% if @admin_sections.any? %>

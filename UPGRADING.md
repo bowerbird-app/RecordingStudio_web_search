@@ -7,11 +7,14 @@ and admin screens keep the same behavior. There is no migration in this gem.
 
 ### What Changed
 
-- The gemspec depends on `recording_studio` `>= 6.1.0`.
-- The run show page sets `content_for :title` and `content_for :subtitle`.
-  Core 6 draws that heading. It calls `flat_pack_page_nav` for the back
-  control and the close anchor. `recording_studio_page_nav` is gone in core 6.
-  The Searches action still uses `recording_studio_page_nav_right`.
+- The gemspec depends on `recording_studio` `~> 6.1` (6.1 up to, but not including, 7).
+- The run show page renders `FlatPack::PageTitle` with the plain query and
+  subtitle. Core 6's default layout strips `content_for :title` and then
+  escapes that string again, so the query is not passed through that slot.
+  The page calls `flat_pack_page_nav` for the back control and the close
+  anchor. The close anchor defaults to the admin surface path. The results
+  sit in `FlatPack::Stack` with `gap: :lg`. `recording_studio_page_nav` is
+  gone in core 6. The Searches action still uses `recording_studio_page_nav_right`.
 - The dummy app opts into the default layout with
   `helper RecordingStudio::LayoutHelper` and
   `layout "recording_studio/default_layout"`.
