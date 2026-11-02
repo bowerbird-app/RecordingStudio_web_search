@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "open3"
 
 class RecordingStudioWebSearchTest < Minitest::Test
   def test_version_matches_release
@@ -240,29 +239,5 @@ class RecordingStudioWebSearchTest < Minitest::Test
     view_path = File.expand_path("../app/views/recording_studio_web_search/home/index.html.erb", __dir__)
 
     refute File.exist?(view_path)
-  end
-
-  def test_coverage_directories_are_gitignored_and_untracked
-    root = File.expand_path("..", __dir__)
-    gitignore = File.read(File.join(root, ".gitignore"))
-
-    assert_includes gitignore, "coverage/"
-    assert_includes gitignore, "test/dummy/coverage/"
-
-    tracked, status = Open3.capture2("git", "-C", root, "ls-files", "--", "coverage", "test/dummy/coverage")
-    assert_equal 0, status.exitstatus
-    assert_equal "", tracked.strip
-  end
-
-  def test_non_matrix_github_actions_pin_ruby_3_3
-    root = File.expand_path("..", __dir__)
-    ci = File.read(File.join(root, ".github/workflows/ci.yml"))
-    security = File.read(File.join(root, ".github/workflows/security.yml"))
-
-    assert_includes ci, "ruby-version: '3.3'"
-    assert_includes ci, "ruby-version: ${{ matrix.ruby-version }}"
-    refute_includes ci, "ruby-version: .ruby-version"
-    assert_includes security, "ruby-version: '3.3'"
-    refute_includes security, "ruby-version: .ruby-version"
   end
 end

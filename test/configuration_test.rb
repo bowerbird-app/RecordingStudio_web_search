@@ -158,6 +158,14 @@ class ConfigurationTest < Minitest::Test
     assert_equal "usage_key_resolver must respond to call", error.message
   end
 
+  def test_configuration_isolation_tracks_every_public_writer
+    writers = RecordingStudio::WebSearch::Configuration.public_instance_methods(false).grep(/=\z/)
+    fields = writers.map { |name| name.to_s.delete_suffix("=").to_sym }.sort
+
+    assert_equal fields, WebSearchConfigurationIsolation.writable_fields
+    refute_includes fields, :hooks
+  end
+
   def test_configure_rejects_a_handler_without_a_resolver
     original = snapshot_web_search_configuration
     reset_web_search_configuration_to_defaults
