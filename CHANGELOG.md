@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+* The minimum FlatPack is now `0.1.331` because the run page uses `FlatPack::Text`.
+
 ## [0.6.1] - 2026-11-02
 
 ### Changed
