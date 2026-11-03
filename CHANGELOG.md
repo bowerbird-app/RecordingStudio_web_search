@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+* The minimum FlatPack is now `0.1.331` because the run page uses `FlatPack::Text`.
+
+## [0.6.1] - 2026-11-02
+
+### Changed
+
+* The search-run result rows render title, domain, and description with
+  `FlatPack::Text` instead of raw `<span>` tags.
+* The engine views need Flatpack `>= 0.1.331` (this repo already pins
+  `v0.1.332`). The gemspec still does not declare `flat_pack`.
+
+### Upgrade notes
+
+- Hosts that render the run show page need Flatpack `>= 0.1.331`. Pin it from
+  GitHub. There is no gemspec `flat_pack` dependency in this release.
+- No migration. Search and admin behavior is unchanged.
+
 ## [0.6.0] - 2026-11-02
 
 ### Changed
@@ -140,7 +159,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.1...v0.5.2

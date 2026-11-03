@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioWebSearchTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.6.0", ::RecordingStudio::WebSearch::VERSION
+    assert_equal "0.6.1", ::RecordingStudio::WebSearch::VERSION
   end
 
   def test_engine_exists
@@ -30,7 +30,13 @@ class RecordingStudioWebSearchTest < Minitest::Test
 
     assert_includes view, "FlatPack::PageTitle::Component.new(title: @run.query.to_s, subtitle: @subtitle.presence)"
     assert_includes view, "FlatPack::Stack::Component.new(gap: :lg)"
+    assert_includes view, "FlatPack::Text::Component.new(text: page[\"title\"].to_s, as: :div, weight: :semibold)"
+    assert_includes view, "as: :div, size: :sm, style: :muted"
+    assert_includes view, "as: :p, size: :sm, class: \"mt-1 leading-6\""
+    assert_includes view, "page[\"domain\"].to_s"
+    assert_includes view, "page[\"description\"].to_s"
     assert_includes view, "RecordingStudioAdmin.configuration.surface_for(:admin).path"
+    refute_includes view, '<span class="block font-semibold">'
     refute_includes view, "html_safe"
     refute_includes view, "content_for :title"
     refute_includes view, "default_mount_path"
