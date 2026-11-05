@@ -5,10 +5,7 @@ module RecordingStudio
     class RunsController < ApplicationController
       include StaffGate
 
-      helper RecordingStudio::LayoutHelper if defined?(RecordingStudio::LayoutHelper)
       helper_method :page_nav_anchor_url, :result_item_options
-
-      layout "recording_studio/default_layout"
 
       before_action :authenticate_staff!
       before_action :authorize_staff!

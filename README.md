@@ -13,6 +13,8 @@ end
 
 Timeouts default to open 5, read 10, and write 5 seconds. Cost defaults to USD 5 per 1000 Brave requests. Instrumentation is on unless you set `config.instrumentation_enabled = false`.
 
+`config.layout` defaults to `nil`. A `nil` setting uses `RecordingStudio.configuration.layout`, then `recording_studio/default_layout`. Pass a layout name, `false`, or a callable that accepts `controller:`. `RecordingStudio::Layout.accept` validates the value. Engine controllers call `recording_studio_layout`. Do not hard-code `layout "recording_studio/default_layout"`.
+
 ## Charge a search
 
 Web Search names the provider operation. The host handler picks the billing line. Recording Studio Stripe maps the key to credits.
@@ -136,7 +138,7 @@ The dummy app installs Recording Studio AI at `/recording_studio_ai` and turns o
 
 ## Admin
 
-Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree. Each run keeps a snapshot of title, URL, domain, and description, and the Brave key stays off the page. The run show page draws those fields with `FlatPack::Text`. Hosts that render that page need Flatpack `>= 0.1.331`. This gem does not add a gemspec `flat_pack` dependency.
+Staff screens register when `recording_studio_admin` is loaded. They read a search-run log. Result pages stay out of the tree. Each run keeps a snapshot of title, URL, domain, and description, and the Brave key stays off the page. The run show page draws those fields with `FlatPack::Text`. Hosts that render that page need Flatpack `>= 0.1.341` and Recording Studio `>= 6.3.0`.
 
 The run show page and Admin DSL chrome (section/screen titles, widget
 titles/info, link text, summary and chart labels) ship English interface copy

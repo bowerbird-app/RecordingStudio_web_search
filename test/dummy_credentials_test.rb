@@ -53,7 +53,6 @@ class DummyCredentialsTest < Minitest::Test
     assert_equal PLACEHOLDER, parsed.dig("smtp", "password")
     assert_equal PLACEHOLDER, parsed.dig("aws", "access_key_id")
     assert_equal PLACEHOLDER, parsed.dig("aws", "secret_access_key")
-    assert_equal PLACEHOLDER, parsed.dig("gem_template", "api_key")
   end
 
   private

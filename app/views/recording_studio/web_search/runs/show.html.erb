@@ -28,7 +28,7 @@
             <%= render FlatPack::Text::Component.new(text: page["domain"].to_s, as: :div, size: :sm, style: :muted) %>
           <% end %>
           <% if page["description"].present? %>
-            <%= render FlatPack::Text::Component.new(text: page["description"].to_s, as: :p, size: :sm, class: "mt-1 leading-6") %>
+            <%= render FlatPack::Text::Component.new(text: page["description"].to_s, as: :p, size: :sm, style: :muted) %>
           <% end %>
         <% end %>
       <% end %>

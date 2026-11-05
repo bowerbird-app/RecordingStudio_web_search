@@ -4,7 +4,8 @@ module RecordingStudio
   module WebSearch
     class ApplicationController < ActionController::Base
       protect_from_forgery with: :exception
-      layout "application"
+
+      recording_studio_layout { RecordingStudio::WebSearch.configuration.layout }
     end
   end
 end

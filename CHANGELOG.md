@@ -7,9 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-05
+
 ### Changed
 
-* The minimum FlatPack is now `0.1.331` because the run page uses `FlatPack::Text`.
+* Require `recording_studio` `>= 6.3.0` and `flat_pack` `>= 0.1.341`. Development pins Recording Studio `v6.3.0` and Flatpack `v0.1.341`.
+* Dummy pins move to Accessible `v0.24.1`, Trashable `v0.12.2`, Cache `v0.6.2`, Metrics `v0.7.2`, Logs `v0.7.3`, and Root Switchable `v0.11.5`. Admin stays at `v2.8.1`. AI stays at `v0.19.5`.
+* Engine controllers call `recording_studio_layout`. `RecordingStudio::WebSearch.configuration.layout` defaults to `nil` and is validated by `RecordingStudio::Layout.accept`.
+* Run-page close/back `anchor_url` only accepts relative `/` paths (`UrlSafety.safe_href` with `allow_external: false`).
+* Rails locks move to `8.1.4.1`. Rack, Nokogiri, Loofah, rails-html-sanitizer, and the other bundler-audit findings on the root lock are refreshed. `.ruby-version` is `3.3.13`.
+* Drop leftover template files (`docs/gem_template/`, `UPDATE_SUMMARY.md`, `MIGRATION_NOTES.md`).
+
+### Upgrade notes
+
+- Install Recording Studio 6.3.0 or newer and Flatpack `>= 0.1.341` from GitHub.
+- Set `config.layout` only when the host must override the default layout. `nil` keeps core's Default Layout.
+- Close and back on the run page ignore absolute `anchor_url` values. Pass a relative path that starts with `/`.
+- No migration. Search and admin behavior is otherwise unchanged.
+- See [UPGRADING.md](UPGRADING.md#070).
 
 ## [0.6.1] - 2026-11-02
 
@@ -159,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.2...v0.5.3

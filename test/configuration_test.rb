@@ -18,6 +18,7 @@ class ConfigurationTest < Minitest::Test
     assert_equal true, @configuration.instrumentation_enabled
     assert_nil @configuration.usage_handler
     assert_nil @configuration.usage_key_resolver
+    assert_nil @configuration.layout
     assert_equal false, @configuration.to_h[:usage_handler_configured]
     assert_equal false, @configuration.to_h[:usage_key_resolver_configured]
     assert_instance_of RecordingStudio::Hooks, @configuration.hooks
@@ -106,6 +107,26 @@ class ConfigurationTest < Minitest::Test
 
     assert_equal 2, result.fetch(:hooks_registered).fetch(:before_initialize)
     assert_equal 1, result.fetch(:hooks_registered).fetch(:after_service)
+  end
+
+  def test_layout_accepts_a_name_false_and_a_callable
+    @configuration.layout = "application"
+    assert_equal "application", @configuration.layout
+
+    @configuration.layout = false
+    assert_equal false, @configuration.layout
+
+    callable = ->(controller:) { [controller, "application"].last }
+    @configuration.layout = callable
+    assert_equal callable, @configuration.layout
+
+    @configuration.layout = nil
+    assert_nil @configuration.layout
+  end
+
+  def test_layout_rejects_a_blank_or_positional_callable
+    assert_raises(ArgumentError) { @configuration.layout = " " }
+    assert_raises(ArgumentError) { @configuration.layout = ->(_controller) { "application" } }
   end
 
   def test_configure_without_block_is_safe

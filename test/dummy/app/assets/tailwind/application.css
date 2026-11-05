@@ -11,6 +11,9 @@
 @source "../../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 @source "../../../../../../usr/local/lib/ruby/gems/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio_admin-*/app/**/*.{rb,erb}";
 
 /* Recording Studio layouts and addon screens. The gem directory is case-sensitive. */
 @source "../../../../../../usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";

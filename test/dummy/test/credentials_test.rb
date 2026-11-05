@@ -16,7 +16,6 @@ class CredentialsTest < ActiveSupport::TestCase
     assert_equal "dev_placeholder", credentials.dig(:smtp, :password)
     assert_equal "dev_placeholder", credentials.dig(:aws, :access_key_id)
     assert_equal "dev_placeholder", credentials.dig(:aws, :secret_access_key)
-    assert_equal "dev_placeholder", credentials.dig(:gem_template, :api_key)
   end
 
   private
