@@ -4,9 +4,7 @@ require "test_helper"
 
 class SearchesReturnUrlSafetyTest < Minitest::Test
   def teardown
-    return unless @loaded_real_admin
-
-    Object.send(:remove_const, :RecordingStudioAdmin) if defined?(RecordingStudioAdmin)
+    restore_admin_mount_path!
   end
 
   def test_anchor_url_uses_real_admin_url_safety_and_rejects_external_urls
@@ -28,17 +26,37 @@ class SearchesReturnUrlSafetyTest < Minitest::Test
 
   private
 
+  module StaffMountConfiguration
+    def configuration
+      @configuration ||= Struct.new(:default_mount_path).new("/staff")
+    end
+  end
+
   def load_real_admin_url_safety!
     path = admin_url_safety_path
     skip "recording_studio_admin is not installed in the dummy bundle" if path.nil?
 
-    Object.send(:remove_const, :RecordingStudioAdmin) if defined?(RecordingStudioAdmin)
     require path
+    ensure_staff_mount_path!
+  end
+
+  def ensure_staff_mount_path!
     unless RecordingStudioAdmin.respond_to?(:configuration)
-      config = Struct.new(:default_mount_path).new("/staff")
-      RecordingStudioAdmin.define_singleton_method(:configuration) { config }
+      RecordingStudioAdmin.extend(StaffMountConfiguration)
+      return
     end
-    @loaded_real_admin = true
+
+    config = RecordingStudioAdmin.configuration
+    @original_mount_path = config.default_mount_path
+    @restored_mount_path = true
+    config.default_mount_path = "/staff"
+  end
+
+  def restore_admin_mount_path!
+    return unless @restored_mount_path
+    return unless defined?(RecordingStudioAdmin) && RecordingStudioAdmin.respond_to?(:configuration)
+
+    RecordingStudioAdmin.configuration.default_mount_path = @original_mount_path
   end
 
   def admin_url_safety_path

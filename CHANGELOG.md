@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Dummy pins move to Accessible `v0.24.1`, Trashable `v0.12.2`, Cache `v0.6.2`, Metrics `v0.7.2`, Logs `v0.7.3`, and Root Switchable `v0.11.5`. Admin stays at `v2.8.1`. AI stays at `v0.19.5`.
 * Engine controllers call `recording_studio_layout`. `RecordingStudio::WebSearch.configuration.layout` defaults to `nil` and is validated by `RecordingStudio::Layout.accept`.
 * Run-page close/back `anchor_url` only accepts relative `/` paths (`UrlSafety.safe_href` with `allow_external: false`).
-* Rails locks move to `8.1.4.1`. Rack, Nokogiri, Loofah, rails-html-sanitizer, and the other bundler-audit findings on the root lock are refreshed. `.ruby-version` is `3.3.13`.
+* Rails locks move to `8.1.4.1`. Rack, Nokogiri, Loofah, rails-html-sanitizer, and the other bundler-audit findings on the root lock are refreshed.
 * Drop leftover template files (`docs/gem_template/`, `UPDATE_SUMMARY.md`, `MIGRATION_NOTES.md`).
 
 ### Upgrade notes
