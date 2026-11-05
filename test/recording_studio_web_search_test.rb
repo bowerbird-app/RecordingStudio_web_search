@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioWebSearchTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.6.1", ::RecordingStudio::WebSearch::VERSION
+    assert_equal "0.7.0", ::RecordingStudio::WebSearch::VERSION
   end
 
   def test_engine_exists
@@ -15,12 +15,14 @@ class RecordingStudioWebSearchTest < Minitest::Test
     refute defined?(RecordingStudioWebSearch)
   end
 
-  def test_gemspec_requires_recording_studio_6_1
+  def test_gemspec_requires_recording_studio_6_3
     gemspec = File.read(File.expand_path("../recording_studio_web_search.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.1"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.3.0"'
+    assert_includes gemspec, 'spec.add_dependency "flat_pack", ">= 0.1.341"'
     refute_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
-    refute_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.1.0"'
+    refute_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.1"'
+    refute_includes gemspec, "recording_studio_admin"
   end
 
   def test_run_show_renders_the_query_without_marking_it_safe
@@ -32,7 +34,8 @@ class RecordingStudioWebSearchTest < Minitest::Test
     assert_includes view, "FlatPack::Stack::Component.new(gap: :lg)"
     assert_includes view, "FlatPack::Text::Component.new(text: page[\"title\"].to_s, as: :div, weight: :semibold)"
     assert_includes view, "as: :div, size: :sm, style: :muted"
-    assert_includes view, "as: :p, size: :sm, class: \"mt-1 leading-6\""
+    assert_includes view, "as: :p, size: :sm, style: :muted"
+    refute_includes view, 'class: "mt-1 leading-6"'
     assert_includes view, "page[\"domain\"].to_s"
     assert_includes view, "page[\"description\"].to_s"
     assert_includes view, "RecordingStudioAdmin.configuration.surface_for(:admin).path"
@@ -82,17 +85,17 @@ class RecordingStudioWebSearchTest < Minitest::Test
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
     assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.332"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.24.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.11.3"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.7.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_cache", tag: "v0.6.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_logs", tag: "v0.7.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.24.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.11.5"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.7.2"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_cache", tag: "v0.6.2"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_logs", tag: "v0.7.3"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.8.1"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_AI", tag: "v0.19.5"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.332"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
     refute_includes gemfile, 'tag: "v4.7.0"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.133"'
@@ -192,6 +195,7 @@ class RecordingStudioWebSearchTest < Minitest::Test
 
     assert_includes readme, "RecordingStudio::WebSearch.search"
     assert_includes readme, "config.provider = :brave"
+    assert_includes readme, "config.layout"
     assert_includes readme, "search.recording_studio_web_search"
     assert_includes readme, "admin@admin.com"
     assert_includes readme, "web_search"
@@ -266,6 +270,28 @@ class RecordingStudioWebSearchTest < Minitest::Test
     assert_includes recording_tree_partial, "parent_builder.node"
     refute_includes recordings_tree_view, "Current structure"
     refute_includes recordings_tree_view, "This tree is generated from RecordingStudio::Recording records"
+  end
+
+  def test_engine_controllers_use_recording_studio_layout
+    application = File.read(
+      File.expand_path("../app/controllers/recording_studio/web_search/application_controller.rb", __dir__)
+    )
+    runs = File.read(
+      File.expand_path("../app/controllers/recording_studio/web_search/runs_controller.rb", __dir__)
+    )
+
+    assert_includes application, "recording_studio_layout { RecordingStudio::WebSearch.configuration.layout }"
+    refute_includes application, 'layout "application"'
+    refute_includes application, 'layout "recording_studio/default_layout"'
+    refute_includes runs, "layout "
+    refute_includes runs, "UsesDefaultLayout"
+    refute File.exist?(File.expand_path("../docs/gem_template", __dir__))
+    refute File.exist?(File.expand_path("../UPDATE_SUMMARY.md", __dir__))
+    refute File.exist?(File.expand_path("../MIGRATION_NOTES.md", __dir__))
+
+    admin_initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_admin.rb", __dir__))
+    refute_includes admin_initializer, "AdminPageNavAnchor"
+    refute_includes admin_initializer, "page_nav.prepend"
   end
 
   def test_engine_does_not_ship_a_home_view

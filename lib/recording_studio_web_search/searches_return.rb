@@ -28,7 +28,7 @@ module RecordingStudio
       def anchor_url(value)
         return if value.blank? || !defined?(RecordingStudioAdmin)
 
-        url = RecordingStudioAdmin::UrlSafety.safe_href(value, allow_external: true)
+        url = RecordingStudioAdmin::UrlSafety.safe_href(value, allow_external: false)
         return if url.blank? || url == "#"
 
         url

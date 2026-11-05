@@ -11,7 +11,7 @@ module RecordingStudio
       attr_writer :provider, :open_timeout, :read_timeout, :write_timeout,
                   :brave_usd_per_1000_requests, :instrumentation_enabled
       attr_accessor :brave_api_key, :usage_handler, :usage_key_resolver
-      attr_reader :hooks
+      attr_reader :hooks, :layout
 
       def initialize
         @provider = :brave
@@ -21,7 +21,12 @@ module RecordingStudio
         @write_timeout = DEFAULT_WRITE_TIMEOUT
         @brave_usd_per_1000_requests = DEFAULT_USD_PER_1000
         @instrumentation_enabled = true
+        @layout = nil
         @hooks = RecordingStudio::Hooks.new
+      end
+
+      def layout=(value)
+        @layout = RecordingStudio::Layout.accept(value)
       end
 
       def provider

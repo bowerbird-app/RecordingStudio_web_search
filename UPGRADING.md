@@ -1,5 +1,42 @@
 # Upgrading
 
+## 0.7.0
+
+This release requires Recording Studio 6.3.0 or newer and Flatpack `>= 0.1.341`.
+Search and admin screens keep the same jobs. There is no migration.
+
+### What Changed
+
+- The gemspec depends on `recording_studio` `>= 6.3.0` and `flat_pack` `>= 0.1.341`.
+- `RecordingStudio::WebSearch.configuration.layout` defaults to `nil`. `nil` uses
+  `RecordingStudio.configuration.layout`, then `recording_studio/default_layout`.
+  Assign a layout name, `false`, or a callable that accepts `controller:`.
+  Engine controllers call `recording_studio_layout`. Do not include
+  `RecordingStudio::UsesDefaultLayout` and do not hard-code
+  `layout "recording_studio/default_layout"`.
+- Run show close/back reads `anchor_url` through Admin `UrlSafety` with
+  `allow_external: false`, so only relative `/` paths become the PageNav close
+  href.
+- Result descriptions use Flatpack Text `size` and `style` only.
+- Dummy pins: Accessible `v0.24.1`, Trashable `v0.12.2`, Cache `v0.6.2`,
+  Metrics `v0.7.2`, Logs `v0.7.3`, Root Switchable `v0.11.5`. Admin stays
+  `v2.8.1`. This gem does not depend on Admin.
+
+### Upgrade Steps
+
+Install Recording Studio 6.3.0 or newer. Pin Flatpack from GitHub. This repo
+uses tag `v0.1.341`:
+
+```ruby
+gem "recording_studio", git: "https://github.com/bowerbird-app/RecordingStudio.git", tag: "v6.3.0"
+gem "flat_pack", git: "https://github.com/bowerbird-app/flatpack.git", tag: "v0.1.341"
+```
+
+Leave `config.layout` unset unless the host must pick another layout. Pass
+relative `anchor_url` values (paths that start with `/`) when linking to a run.
+
+No migration.
+
 ## 0.6.1
 
 This release needs Flatpack `>= 0.1.331` for the run show result copy. Search

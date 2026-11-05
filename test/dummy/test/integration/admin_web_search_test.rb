@@ -248,6 +248,27 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{anchor}']"
   end
 
+  test "search show close ignores an external anchor_url" do
+    sign_in @user
+    run = RecordingStudio::WebSearch::SearchRun.create!(
+      provider: "brave",
+      query: "kept pages",
+      status: "succeeded",
+      outcome: "Succeeded",
+      result_count: 0,
+      estimated_cost_usd: 0,
+      parameters: {},
+      results: []
+    )
+
+    get "/addons/recording/runs/#{run.id}", params: { anchor_url: "https://evil.test/phish" }
+
+    assert_response :success
+    refute_includes response.body, "https://evil.test/phish"
+    assert_equal "#", RecordingStudioAdmin::UrlSafety.safe_href("https://evil.test/phish", allow_external: false)
+    assert_nil RecordingStudio::WebSearch::SearchesReturn.anchor_url("https://evil.test/phish")
+  end
+
   test "search show page explains when pages were not kept" do
     sign_in @user
     run = RecordingStudio::WebSearch::SearchRun.create!(
