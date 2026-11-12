@@ -10,6 +10,7 @@ This Rails app exists to validate Recording Studio Web Search in a real host app
 - Recording Studio default layout, FlatPack assets, and Tailwind source scanning
 - Mounted `RecordingStudio::Engine` route behavior inside a host app
 - A signed-in home-page search form that calls `RecordingStudio::WebSearch.search`
+- Mounted Recording Studio API with the gem's `web_search.search` endpoint
 - Dummy-only `/docs/*` pages for gem-specific onboarding
 
 ## Quick Start
@@ -32,6 +33,7 @@ Then open the app and sign in with:
 
 - `/` - signed-in web search demo
 - `/recording_studio` - redirects to `/` while the mounted Recording Studio engine stays available under that prefix for non-root routes
+- `/recording_studio_api` - mounted Recording Studio API (`GET /recording_studio_api/api/v1/web_search`)
 - `/users/sign_in` - Devise sign-in page
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
 - `/up` - Rails health check

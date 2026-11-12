@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioWebSearchTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.7.0", ::RecordingStudio::WebSearch::VERSION
+    assert_equal "0.8.0", ::RecordingStudio::WebSearch::VERSION
   end
 
   def test_engine_exists
@@ -23,6 +23,7 @@ class RecordingStudioWebSearchTest < Minitest::Test
     refute_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
     refute_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.1"'
     refute_includes gemspec, "recording_studio_admin"
+    refute_includes gemspec, "recording_studio_api"
   end
 
   def test_run_show_renders_the_query_without_marking_it_safe
@@ -95,6 +96,10 @@ class RecordingStudioWebSearchTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.8.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_AI", tag: "v0.19.5"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.21.3"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_moveable", tag: "v4.1.1"'
+    assert_includes gemfile, 'gem "redis"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
     refute_includes gemfile, 'tag: "v4.7.0"'
     refute_includes gemfile, "recording_studio/v3.0.0"
@@ -173,8 +178,8 @@ class RecordingStudioWebSearchTest < Minitest::Test
     initializer_source = File.read(initializer_path)
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
-    recordable_types = "config.recordable_types = [ \"Workspace\", \"Folder\", \"Page\", \"AdminRoot\" ]"
-    assert_includes initializer_source, recordable_types
+    assert_includes initializer_source, "\"Workspace\", \"Folder\", \"Page\", \"AdminRoot\""
+    assert_includes initializer_source, "\"RecordingStudioApi::AdminApi\""
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-12
+
+### Added
+
+* A `web_search.search` Recording Studio API endpoint, registered when that gem is loaded. The handler authorizes the grant on the request root at `:view` and calls `RecordingStudio::WebSearch.search` with `attribution:` from the request context. MCP advertises the endpoint; this gem adds no MCP tool.
+* Dummy mounts Recording Studio API `v0.21.3` (with Logs, Moveable, Icons, Admin, Redis, and Flatpack `0.1.341`).
+
+### Changed
+
+* The AI `web_search` tool executor authorizes `:view` and passes `attribution:` from the tool context.
+
+### Upgrade notes
+
+- Hosts that already mount Recording Studio API get `GET .../web_search` when this gem is loaded. No extra MCP registration.
+- Custom-tool callers must be able to `:view` the context root. Pass a context that carries attribution so usage metering still sees the host object.
+- No migration in this gem. Copy Recording Studio API migrations into the host if the dummy-style HTTP surface is new there.
+- See [UPGRADING.md](UPGRADING.md#080).
+
 ## [0.7.0] - 2026-11-05
 
 ### Changed
@@ -174,7 +192,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.5.3...v0.6.0
