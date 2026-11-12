@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* A `web_search.search` Recording Studio API endpoint, registered when that gem is loaded. The handler authorizes the grant on the request root at `:view` and calls `RecordingStudio::WebSearch.search` with the request context as `attribution:`. Invalid queries map to `RecordingStudioApi::InvalidActionInputError` (422). Provider failures map to `RecordingStudioApi::Error`. MCP advertises the endpoint; this gem adds no MCP tool.
+* A `web_search.search` Recording Studio API endpoint, registered when that gem is loaded. The handler authorizes the grant on the request root at `:view` and calls `RecordingStudio::WebSearch.search` with the request context as `attribution:`. Invalid queries map to `RecordingStudioApi::InvalidActionInputError` (422). Provider errors re-raise unchanged. MCP advertises the endpoint; this gem adds no MCP tool.
 * Dummy mounts Recording Studio API `v0.21.3` (with Logs, Moveable, Icons, Admin, Redis, and Flatpack `0.1.341`).
 
 ### Upgrade notes

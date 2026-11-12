@@ -115,10 +115,6 @@ module RecordingStudio
         end
       end
 
-      initializer "recording_studio_web_search.api" do
-        config.to_prepare { HostBoot.register_api! }
-      end
-
       initializer "recording_studio_web_search.apply_controller_extensions" do
         config.to_prepare do
           next unless defined?(ActionController::Base)

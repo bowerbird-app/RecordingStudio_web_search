@@ -12,7 +12,7 @@ loaded. Search behavior is otherwise the same. There is no migration in this gem
   `context.root_recording` at `:view`, then calls
   `RecordingStudio::WebSearch.search` with the request context as
   `attribution:`. Invalid queries raise `InvalidActionInputError` (HTTP 422).
-  Provider failures raise `RecordingStudioApi::Error`.
+  Provider errors re-raise unchanged.
 - The AI custom tool is unchanged from 0.7.0.
 - This gem still does not depend on `recording_studio_api`. The dummy app pins
   API `v0.21.3`, Moveable, Icons, Redis, Logs, Admin, and Flatpack `0.1.341`.

@@ -23,9 +23,10 @@ class ApiTest < Minitest::Test
     search = File.read(File.expand_path("../lib/recording_studio_web_search/api/search.rb", __dir__))
     boot = File.read(File.expand_path("../lib/recording_studio_web_search/host_boot.rb", __dir__))
 
-    assert_includes engine, 'initializer "recording_studio_web_search.api"'
-    assert_includes engine, "HostBoot.register_api!"
+    refute_includes engine, 'initializer "recording_studio_web_search.api"'
+    assert_includes engine, "HostBoot.prepare!"
     assert_includes boot, "require \"recording_studio_web_search/api\""
+    assert_includes boot, "def self.register_api!"
     assert_includes boot, "Api.register!"
     assert_includes api, "return unless defined?(::RecordingStudioApi)"
     assert_includes api, "RecordingStudioApi.configuration.each_api"
@@ -42,7 +43,7 @@ class ApiTest < Minitest::Test
     assert_includes search, "attribution: context"
     assert_includes search, "RecordingStudio::WebSearch.search"
     assert_includes search, "RecordingStudioApi::InvalidActionInputError"
-    assert_includes search, "RecordingStudioApi::Error"
+    refute_includes search, "rescue ProviderError"
     refute_includes search, "respond_to?"
     refute_includes search, ":provider"
   end

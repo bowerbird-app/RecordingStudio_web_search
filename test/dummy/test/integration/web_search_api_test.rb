@@ -117,19 +117,18 @@ class WebSearchApiTest < ActionDispatch::IntegrationTest
     RecordingStudio::WebSearch.define_singleton_method(:search, original) if original
   end
 
-  test "web_search.search maps a provider failure to RecordingStudioApi::Error" do
+  test "web_search.search re-raises a provider failure" do
     original = RecordingStudio::WebSearch.method(:search)
     RecordingStudio::WebSearch.define_singleton_method(:search) do |*|
       raise RecordingStudio::WebSearch::ProviderError.new("The search provider returned an error", status: 502)
     end
 
-    error = assert_raises(RecordingStudioApi::Error) do
+    error = assert_raises(RecordingStudio::WebSearch::ProviderError) do
       get "/recording_studio_api/api/v1/web_search",
           params: { query: "opera house" },
           headers: bearer_headers(issue_token_for(@owner, @root).fetch(:token))
     end
 
-    refute_instance_of RecordingStudioApi::InvalidActionInputError, error
     assert_equal "The search provider returned an error", error.message
   ensure
     RecordingStudio::WebSearch.define_singleton_method(:search, original) if original

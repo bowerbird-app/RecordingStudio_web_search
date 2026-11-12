@@ -16,8 +16,6 @@ module RecordingStudio
           ).to_h
         rescue InvalidQueryError => e
           raise RecordingStudioApi::InvalidActionInputError, e.message
-        rescue ProviderError => e
-          raise RecordingStudioApi::Error, e.message
         end
 
         def self.search_options(params)

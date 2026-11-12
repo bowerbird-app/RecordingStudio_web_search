@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "recording_studio_web_search/api"
+
 module RecordingStudio
   module WebSearch
     module HostBoot
@@ -13,7 +15,6 @@ module RecordingStudio
       def self.register_api!
         return unless defined?(RecordingStudioApi)
 
-        require "recording_studio_web_search/api"
         Api.register!
       end
 

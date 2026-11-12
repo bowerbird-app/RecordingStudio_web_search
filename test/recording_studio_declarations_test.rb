@@ -7,6 +7,19 @@ require_relative "dummy/config/environment"
 require "rails/test_help"
 
 class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
+  setup do
+    @user = User.find_or_create_by!(email: "declarations-test@example.com") do |user|
+      user.password = "Password"
+      user.password_confirmation = "Password"
+    end
+    @previous_actor = Current.actor
+    Current.actor = @user
+  end
+
+  teardown do
+    Current.actor = @previous_actor
+  end
+
   test "dummy recordable declarations validate and expose parent/root introspection" do
     assert RecordingStudio.validate_recordable_declarations!
     assert_equal %w[AdminRoot Workspace], RecordingStudio.root_recordable_types.sort
@@ -28,6 +41,9 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   test "allowed child can be recorded under a workspace root" do
     root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Child Workspace")))
     folder = Folder.new(name: unique_name("Allowed Folder"))
+    unless RecordingStudioAccessible.authorized?(actor: @user, recording: root_recording, role: :edit)
+      RecordingStudioAccessible.bootstrap_owner_access!(recording: root_recording, actor: @user).value!
+    end
 
     event = RecordingStudio.record!(
       action: "created",
@@ -91,11 +107,16 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   private
 
   def record_child(recordable, root_recording, parent_recording)
+    unless RecordingStudioAccessible.authorized?(actor: @user, recording: root_recording, role: :edit)
+      RecordingStudioAccessible.bootstrap_owner_access!(recording: root_recording, actor: @user).value!
+    end
+
     RecordingStudio.record!(
       action: "created",
       recordable: recordable,
       root_recording: root_recording,
-      parent_recording: parent_recording
+      parent_recording: parent_recording,
+      actor: @user
     ).recording
   end
 
