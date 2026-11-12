@@ -14,23 +14,15 @@ module RecordingStudio
 
       class << self
         def register!
-          return unless available?
+          return unless defined?(::RecordingStudioApi)
 
           RecordingStudioApi.configuration.each_api { |api| register_on(api) }
-          true
-        end
-
-        def available?
-          defined?(RecordingStudioApi) &&
-            RecordingStudioApi.respond_to?(:register_endpoint) &&
-            RecordingStudioApi.respond_to?(:registered_endpoint) &&
-            RecordingStudioApi.respond_to?(:configuration)
         end
 
         private
 
         def register_on(api)
-          return if RecordingStudioApi.registered_endpoint(NAME, api: api.name)
+          return if already_registered?(api)
 
           RecordingStudioApi.register_endpoint(
             NAME,
@@ -41,6 +33,14 @@ module RecordingStudio
             openapi: OPENAPI,
             input_contract: INPUT_CONTRACT
           )
+        end
+
+        def already_registered?(api)
+          existing = RecordingStudioApi.registered_endpoint(NAME, api: api.name)
+          return false unless existing
+          return true if existing.handler == Search
+
+          raise RecordingStudioApi::ConfigurationError, "API endpoint #{NAME} is already registered"
         end
       end
     end

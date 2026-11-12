@@ -11,17 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* A `web_search.search` Recording Studio API endpoint, registered when that gem is loaded. The handler authorizes the grant on the request root at `:view` and calls `RecordingStudio::WebSearch.search` with `attribution:` from the request context. MCP advertises the endpoint; this gem adds no MCP tool.
+* A `web_search.search` Recording Studio API endpoint, registered when that gem is loaded. The handler authorizes the grant on the request root at `:view` and calls `RecordingStudio::WebSearch.search` with the request context as `attribution:`. Invalid queries map to `RecordingStudioApi::InvalidActionInputError` (422). Provider failures map to `RecordingStudioApi::Error`. MCP advertises the endpoint; this gem adds no MCP tool.
 * Dummy mounts Recording Studio API `v0.21.3` (with Logs, Moveable, Icons, Admin, Redis, and Flatpack `0.1.341`).
-
-### Changed
-
-* The AI `web_search` tool executor authorizes `:view` and passes `attribution:` from the tool context.
 
 ### Upgrade notes
 
-- Hosts that already mount Recording Studio API get `GET .../web_search` when this gem is loaded. No extra MCP registration.
-- Custom-tool callers must be able to `:view` the context root. Pass a context that carries attribution so usage metering still sees the host object.
+- Hosts that already mount Recording Studio API get `GET .../web_search` when this gem is loaded. No extra MCP registration. Callers cannot pick a search provider on the endpoint; the host default is used.
 - No migration in this gem. Copy Recording Studio API migrations into the host if the dummy-style HTTP surface is new there.
 - See [UPGRADING.md](UPGRADING.md#080).
 

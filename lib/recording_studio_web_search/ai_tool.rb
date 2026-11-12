@@ -57,7 +57,7 @@ module RecordingStudio
         requires_confirmation: false,
         idempotent: true,
         executor_label: "RecordingStudio::WebSearch.search",
-        executor: ->(arguments, context) { execute(arguments, context).to_h }
+        executor: ->(arguments, _context) { execute(arguments).to_h }
       }.freeze
 
       def self.register!
@@ -66,37 +66,9 @@ module RecordingStudio
         ::RecordingStudioAI.tools.register(**DEFINITION, override: true)
       end
 
-      def self.execute(arguments, context = nil)
-        authorize!(context)
-        RecordingStudio::WebSearch.search(
-          arguments.fetch("query"),
-          **search_options(arguments),
-          attribution: attribution_from(context)
-        )
+      def self.execute(arguments)
+        RecordingStudio::WebSearch.search(arguments.fetch("query"), **search_options(arguments))
       end
-
-      def self.authorize!(context)
-        recording = context.root_recording if context.respond_to?(:root_recording)
-        grant = context.access_grant if context.respond_to?(:access_grant)
-        if grant.respond_to?(:authorize!)
-          grant.authorize!(recording: recording, role: :view)
-          return
-        end
-
-        actor = context.initiator if context.respond_to?(:initiator)
-        return if defined?(::RecordingStudioAccessible) &&
-                  ::RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
-
-        raise "API access grant is not authorized for this capability"
-      end
-      private_class_method :authorize!
-
-      def self.attribution_from(context)
-        return context.attribution if context.respond_to?(:attribution)
-
-        context
-      end
-      private_class_method :attribution_from
 
       def self.search_options(arguments)
         OPTION_KEYS.each_with_object({}) do |key, options|

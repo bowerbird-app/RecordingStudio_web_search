@@ -10,12 +10,14 @@ loaded. Search behavior is otherwise the same. There is no migration in this gem
 - `RecordingStudio::WebSearch::Api.register!` adds `GET web_search` as
   `web_search.search`. The handler authorizes the AccessGrant on
   `context.root_recording` at `:view`, then calls
-  `RecordingStudio::WebSearch.search` with `attribution:` from the request
-  context.
-- The AI custom tool executor authorizes `:view` the same way and forwards
-  `attribution:` from the tool context.
+  `RecordingStudio::WebSearch.search` with the request context as
+  `attribution:`. Invalid queries raise `InvalidActionInputError` (HTTP 422).
+  Provider failures raise `RecordingStudioApi::Error`.
+- The AI custom tool is unchanged from 0.7.0.
 - This gem still does not depend on `recording_studio_api`. The dummy app pins
   API `v0.21.3`, Moveable, Icons, Redis, Logs, Admin, and Flatpack `0.1.341`.
+- The endpoint does not accept a `provider` parameter. Search uses the host
+  default.
 
 ### Upgrade Steps
 

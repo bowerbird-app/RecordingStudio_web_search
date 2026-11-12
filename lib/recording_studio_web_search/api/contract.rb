@@ -5,7 +5,7 @@ module RecordingStudio
     module Api
       OPENAPI = {
         title: "Web search",
-        summary: "Search the public web",
+        summary: "Return titles, links, and short descriptions from the public web.",
         description: "Searches the public web and brings back titles, links, and short descriptions.",
         tags: ["Web search"],
         parameters: [

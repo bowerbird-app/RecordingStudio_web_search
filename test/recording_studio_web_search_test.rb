@@ -178,8 +178,12 @@ class RecordingStudioWebSearchTest < Minitest::Test
     initializer_source = File.read(initializer_path)
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
-    assert_includes initializer_source, "\"Workspace\", \"Folder\", \"Page\", \"AdminRoot\""
-    assert_includes initializer_source, "\"RecordingStudioApi::AdminApi\""
+    recordable_types = "config.recordable_types = [ \"Workspace\", \"Folder\", \"Page\", \"AdminRoot\" ]"
+    assert_includes initializer_source, recordable_types
+    assert_includes initializer_source, "config.recordable_types += [ \"RecordingStudioApi::AdminApi\" ]"
+    accessible_source = File.read(File.expand_path("dummy/config/initializers/recording_studio_accessible.rb", __dir__))
+    assert_includes accessible_source, "config.access_actor_types = [ \"User\" ]"
+    assert_includes accessible_source, "config.access_actor_types += [ \"RecordingStudioApi::ApiClient\" ]"
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"

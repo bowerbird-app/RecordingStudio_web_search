@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RecordingStudio.configure do |config|
-  config.recordable_types = [ "Workspace", "Folder", "Page", "AdminRoot", "RecordingStudioApi::AdminApi" ]
+  config.recordable_types = [ "Workspace", "Folder", "Page", "AdminRoot" ]
+  config.recordable_types += [ "RecordingStudioApi::AdminApi" ]
 
   config.require_recordable_declarations = true
 

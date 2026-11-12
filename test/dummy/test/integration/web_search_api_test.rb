@@ -88,6 +88,53 @@ class WebSearchApiTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "web_search.search returns 422 for an invalid country" do
+    get "/recording_studio_api/api/v1/web_search",
+        params: { query: "opera house", country: "USA" },
+        headers: bearer_headers(issue_token_for(@owner, @root).fetch(:token))
+
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+    assert_equal "invalid_input", body.fetch("error").fetch("code")
+  end
+
+  test "web_search.search ignores a provider query param" do
+    captured = nil
+    response = search_response
+    original = RecordingStudio::WebSearch.method(:search)
+    RecordingStudio::WebSearch.define_singleton_method(:search) do |query, **options|
+      captured = [query, options]
+      response
+    end
+
+    get "/recording_studio_api/api/v1/web_search",
+        params: { query: "opera house", provider: "paid" },
+        headers: bearer_headers(issue_token_for(@owner, @root).fetch(:token))
+
+    assert_response :success
+    refute captured.last.key?(:provider)
+  ensure
+    RecordingStudio::WebSearch.define_singleton_method(:search, original) if original
+  end
+
+  test "web_search.search maps a provider failure to RecordingStudioApi::Error" do
+    original = RecordingStudio::WebSearch.method(:search)
+    RecordingStudio::WebSearch.define_singleton_method(:search) do |*|
+      raise RecordingStudio::WebSearch::ProviderError.new("The search provider returned an error", status: 502)
+    end
+
+    error = assert_raises(RecordingStudioApi::Error) do
+      get "/recording_studio_api/api/v1/web_search",
+          params: { query: "opera house" },
+          headers: bearer_headers(issue_token_for(@owner, @root).fetch(:token))
+    end
+
+    refute_instance_of RecordingStudioApi::InvalidActionInputError, error
+    assert_equal "The search provider returned an error", error.message
+  ensure
+    RecordingStudio::WebSearch.define_singleton_method(:search, original) if original
+  end
+
   private
 
   Response = Struct.new(:code, :body) do

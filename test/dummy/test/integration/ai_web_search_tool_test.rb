@@ -32,47 +32,17 @@ class AiWebSearchToolTest < ActionDispatch::IntegrationTest
     tool = RecordingStudioAI.tools.fetch("web_search", version: 1)
     response = search_response
     captured = nil
-    context = authorized_tool_context
     original = RecordingStudio::WebSearch.method(:search)
     RecordingStudio::WebSearch.define_singleton_method(:search) do |query, **options|
       captured = [query, options]
       response
     end
 
-    result = tool.executor.call(
-      { "query" => "opera house", "language" => "en", "freshness" => "week" },
-      context
-    )
+    result = tool.executor.call({ "query" => "opera house", "language" => "en", "freshness" => "week" }, nil)
 
     assert_equal response.to_h, result
-    assert_equal ["opera house", { language: "en", freshness: "week", attribution: context }], captured
+    assert_equal ["opera house", { language: "en", freshness: "week" }], captured
     refute_includes result_keys(response), "api_key"
-  ensure
-    RecordingStudio::WebSearch.define_singleton_method(:search, original) if original
-  end
-
-  test "the registered tool authorizes view and forwards attribution" do
-    tool = RecordingStudioAI.tools.fetch("web_search", version: 1)
-    attribution = Object.new
-    recording = RecordingStudio.root_recording_for(Workspace.find_or_create_by!(name: "AI tool workspace"))
-    RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: @user).value! unless
-      RecordingStudioAccessible.authorized?(actor: @user, recording: recording, role: :view)
-    captured = nil
-    user = @user
-    context = Object.new
-    context.define_singleton_method(:initiator) { user }
-    context.define_singleton_method(:root_recording) { recording }
-    context.define_singleton_method(:attribution) { attribution }
-    response = search_response
-    original = RecordingStudio::WebSearch.method(:search)
-    RecordingStudio::WebSearch.define_singleton_method(:search) do |_query, **options|
-      captured = options
-      response
-    end
-
-    tool.executor.call({ "query" => "opera house" }, context)
-
-    assert_same attribution, captured[:attribution]
   ensure
     RecordingStudio::WebSearch.define_singleton_method(:search, original) if original
   end
@@ -116,19 +86,6 @@ class AiWebSearchToolTest < ActionDispatch::IntegrationTest
 
   def result_keys(response)
     response.to_h.keys + response.to_h.fetch("results").flat_map(&:keys)
-  end
-
-  def authorized_tool_context
-    workspace = Workspace.find_or_create_by!(name: "AI tool search workspace")
-    recording = RecordingStudio.root_recording_for(workspace)
-    user = @user
-    unless RecordingStudioAccessible.authorized?(actor: user, recording: recording, role: :view)
-      RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: user).value!
-    end
-    context = Object.new
-    context.define_singleton_method(:initiator) { user }
-    context.define_singleton_method(:root_recording) { recording }
-    context
   end
 
   def grant_admin!(user)

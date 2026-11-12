@@ -132,7 +132,7 @@ Duration is `ActiveSupport::Notifications::Event#duration`. The payload never in
 
 This gem does not depend on `recording_studio_api`. When that gem is loaded, this one registers a GET endpoint `web_search.search` at `/recording_studio_api/api/v1/web_search`. MCP advertises registered endpoints automatically. This gem adds no MCP tool.
 
-The handler authorizes the request AccessGrant on the root recording at `:view`, then calls `RecordingStudio::WebSearch.search`. It passes `attribution:` from the request context. Query parameters are `query` (required), `country`, `language`, `freshness`, and `count`.
+The handler authorizes the request AccessGrant on the root recording at `:view`, then calls `RecordingStudio::WebSearch.search` with the request context as `attribution:`. Query parameters are `query` (required), `country`, `language`, `freshness`, and `count`. There is no `provider` parameter. Invalid queries return 422. Provider failures raise `RecordingStudioApi::Error`.
 
 ```ruby
 # GET /recording_studio_api/api/v1/web_search?query=museum+openings&country=AU
@@ -140,7 +140,7 @@ The handler authorizes the request AccessGrant on the root recording at `:view`,
 
 ## Recording Studio AI
 
-This gem does not depend on `recording_studio_ai`. When that gem is loaded, this one registers a custom tool `web_search` at version `1`. The executor authorizes `:view` on the context root recording through Accessible (or the request AccessGrant when one is present), calls `RecordingStudio::WebSearch.search` with `attribution:` from the context, and returns `response.to_h`.
+This gem does not depend on `recording_studio_ai`. When that gem is loaded, this one registers a custom tool `web_search` at version `1`. The executor calls `RecordingStudio::WebSearch.search` and returns `response.to_h`.
 
 Tool arguments are `query` (required), `country`, `language`, `freshness`, and `count`.
 
