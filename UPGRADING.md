@@ -1,5 +1,40 @@
 # Upgrading
 
+## 0.8.0
+
+This release registers a Recording Studio API search endpoint when that gem is
+loaded. Search behavior is otherwise the same. There is no migration in this gem.
+
+### What Changed
+
+- `RecordingStudio::WebSearch::Api.register!` adds `GET web_search` as
+  `web_search.search`. The handler authorizes the AccessGrant on
+  `context.root_recording` at `:view`, then calls
+  `RecordingStudio::WebSearch.search` with the request context as
+  `attribution:`. Invalid queries raise `InvalidActionInputError` (HTTP 422).
+  Provider errors re-raise unchanged.
+- The AI custom tool is unchanged from 0.7.0.
+- This gem still does not depend on `recording_studio_api`. The dummy app pins
+  API `v0.21.3`, Moveable, Icons, Redis, Logs, Admin, and Flatpack `0.1.341`.
+- The endpoint does not accept a `provider` parameter. Search uses the host
+  default.
+
+### Upgrade Steps
+
+Install this gem at `0.8.0`. If the host already mounts Recording Studio API,
+the endpoint appears after boot. Copy API migrations into the host if they are
+not there yet:
+
+```bash
+bin/rails generate recording_studio_api:migrations
+bin/rails db:migrate
+```
+
+Grant Accessible `:view` on the root used by the API client. No change is
+required for hosts that only call `RecordingStudio::WebSearch.search` in Ruby.
+
+No migration in this gem.
+
 ## 0.7.0
 
 This release requires Recording Studio 6.3.0 or newer and Flatpack `>= 0.1.341`.

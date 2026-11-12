@@ -2,6 +2,7 @@
 
 RecordingStudio.configure do |config|
   config.recordable_types = [ "Workspace", "Folder", "Page", "AdminRoot" ]
+  config.recordable_types += [ "RecordingStudioApi::AdminApi" ] if defined?(RecordingStudioApi)
 
   config.require_recordable_declarations = true
 

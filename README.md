@@ -128,6 +128,16 @@ Payload:
 
 Duration is `ActiveSupport::Notifications::Event#duration`. The payload never includes the API key or the exception object.
 
+## Recording Studio API
+
+This gem does not depend on `recording_studio_api`. When that gem is loaded, this one registers a GET endpoint `web_search.search` at `/recording_studio_api/api/v1/web_search`. MCP advertises registered endpoints automatically. This gem adds no MCP tool.
+
+The handler authorizes the request AccessGrant on the root recording at `:view`, then calls `RecordingStudio::WebSearch.search`. API calls pass the Recording Studio API request context as attribution. Query parameters are `query` (required), `country`, `language`, `freshness`, and `count`. There is no `provider` parameter. Invalid queries return 422. Provider errors re-raise unchanged.
+
+```ruby
+# GET /recording_studio_api/api/v1/web_search?query=museum+openings&country=AU
+```
+
 ## Recording Studio AI
 
 This gem does not depend on `recording_studio_ai`. When that gem is loaded, this one registers a custom tool `web_search` at version `1`. The executor calls `RecordingStudio::WebSearch.search` and returns `response.to_h`.
