@@ -80,7 +80,7 @@ class AdminI18nRenderTest < ActionDispatch::IntegrationTest
 
   def grant_admin!(user)
     admin_root = AdminRoot.find_or_create_by!(name: "Admin")
-    recording = RecordingStudio.root_recording_for(admin_root)
+    recording = RecordingStudio.create_root_recording!(admin_root, actor: user)
     return if RecordingStudioAccessible.authorized?(recording: recording, actor: user, role: :view)
 
     RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: user).value!

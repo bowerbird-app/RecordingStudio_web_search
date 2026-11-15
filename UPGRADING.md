@@ -1,5 +1,72 @@
 # Upgrading
 
+## 0.9.0
+
+This release requires Recording Studio 7.0 or newer, and below 8. Search behavior
+is otherwise the same. This gem ships no migration. The dummy app copies core's
+events `root_recording_id` migration because that column is `NOT NULL` on core 7.
+
+### What Changed
+
+- The gemspec depends on `recording_studio` `>= 7.0`, `< 8.0`. `flat_pack` stays
+  `>= 0.1.341`.
+- `RecordingStudio.root_recording_for` finds an existing root and returns `nil`
+  when it is missing. It does not insert a recording.
+- Create a root with `RecordingStudio.create_root_recording!(recordable, actor:)`.
+  A second call returns the same root and does not append another event.
+- Root creation runs `config.authorize_write` with `recording`, `root_recording`,
+  and `parent_recording` all `nil`. The dummy authorizer allows a present actor.
+- The dummy copies `AddRootRecordingIdToRecordingStudioEvents` from Recording
+  Studio 7.0.0. Seeds use `Recording.kept`. Trashable 0.17 removed `kept_sql`.
+- Admin 2.16 dropped `site_admin_recording_resolver`. The dummy sets
+  `access_recording_resolver` and creates the admin root with
+  `create_root_recording!`. `current_root_recording_resolver` returns nil so a
+  switched workspace does not block admin. Accessible `admin_root_resolver`
+  returns that kept admin root; site-wide screens (`blast_radius :site`) need
+  it. New workspace roots also get `bootstrap_owner_access!` so Root Switchable
+  0.16 can authorize the switch page.
+- Dummy pins: Recording Studio `v7.0.0`, Flatpack `v0.1.376`, Accessible
+  `v0.44.0`, Admin `v2.16.0`, AI `v0.22.0`, API `v0.24.0`, Icons `v0.2.1`,
+  Moveable `v5.0.0`, Metrics `v0.9.0`, Logs `v0.8.0`, Trashable `v0.17.0`,
+  Cache `v0.6.3`, and Root Switchable `v0.16.0`. Root Switchable `v0.11.5`
+  cannot resolve with core 7, so the pin moved to the published core-7 tag.
+  The gem stays in the dummy. Puma is `8.1.0`. `msgpack` is `>= 1.8.7`.
+
+### Upgrade Steps
+
+Install Recording Studio 7.0 or newer, below 8. Pin Flatpack from GitHub. This
+repo uses tag `v0.1.376`:
+
+```ruby
+gem "recording_studio", git: "https://github.com/bowerbird-app/RecordingStudio.git", tag: "v7.0.0"
+gem "flat_pack", git: "https://github.com/bowerbird-app/flatpack.git", tag: "v0.1.376"
+```
+
+Set an authorizer that allows root creation:
+
+```ruby
+RecordingStudio.configure do |config|
+  config.actor = -> { Current.actor }
+  config.authorize_write = lambda { |actor:, **|
+    actor.present?
+  }
+end
+```
+
+Replace creating lookups:
+
+```ruby
+root = RecordingStudio.create_root_recording!(workspace, actor: Current.actor)
+```
+
+Leave find-only call sites on `root_recording_for` and handle `nil`.
+
+Copy Recording Studio's events `root_recording_id` migration into the host and
+migrate. Hosts on Trashable 0.17 use `Recording.kept`. Hosts on Admin 2.16 use
+`access_recording_resolver`.
+
+No migration in this gem.
+
 ## 0.8.0
 
 This release registers a Recording Studio API search endpoint when that gem is

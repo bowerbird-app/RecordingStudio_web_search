@@ -192,7 +192,7 @@ class WebSearchApiTest < ActionDispatch::IntegrationTest
 
   def bootstrap_workspace!(name, actor)
     workspace = Workspace.find_or_create_by!(name: name)
-    root = RecordingStudio.root_recording_for(workspace)
+    root = RecordingStudio.create_root_recording!(workspace, actor: actor)
     unless RecordingStudioAccessible.authorized?(actor: actor, recording: root, role: :view)
       RecordingStudioAccessible.bootstrap_owner_access!(recording: root, actor: actor).value!
     end

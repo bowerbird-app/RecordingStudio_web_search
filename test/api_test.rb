@@ -9,6 +9,17 @@ class ApiTest < Minitest::Test
     assert_nil RecordingStudio::WebSearch::HostBoot.register_api!
   end
 
+  def test_register_admin_skips_a_module_without_the_registry_api
+    had_admin = Object.const_defined?(:RecordingStudioAdmin, false)
+    original_admin = Object.send(:remove_const, :RecordingStudioAdmin) if had_admin
+    Object.const_set(:RecordingStudioAdmin, Module.new)
+
+    assert_nil RecordingStudio::WebSearch::HostBoot.register_admin!
+  ensure
+    Object.send(:remove_const, :RecordingStudioAdmin) if Object.const_defined?(:RecordingStudioAdmin, false)
+    Object.const_set(:RecordingStudioAdmin, original_admin) if had_admin
+  end
+
   def test_gemspec_omits_runtime_recording_studio_api_dependency
     gemspec = File.read(File.expand_path("../recording_studio_web_search.gemspec", __dir__))
 

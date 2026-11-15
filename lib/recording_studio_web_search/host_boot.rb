@@ -20,6 +20,9 @@ module RecordingStudio
 
       def self.register_admin!
         return unless defined?(RecordingStudioAdmin)
+        # Url-safety and staff-gate stubs define the module without the registry.
+        # Screen subclasses load only when Admin can actually register them.
+        return unless RecordingStudioAdmin.respond_to?(:register_screen)
 
         require "recording_studio_web_search/admin"
         Admin.register!

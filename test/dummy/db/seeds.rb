@@ -3,9 +3,7 @@
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
 find_or_record_child = lambda do |recordable, root_recording, parent_recording|
-  RecordingStudio::Recording.where(
-    RecordingStudio::Recording.recording_studio_trashable_kept_sql
-  ).find_by(
+  RecordingStudio::Recording.kept.find_by(
     root_recording: root_recording,
     parent_recording: parent_recording,
     recordable: recordable
@@ -13,7 +11,8 @@ find_or_record_child = lambda do |recordable, root_recording, parent_recording|
     action: "created",
     recordable: recordable,
     root_recording: root_recording,
-    parent_recording: parent_recording
+    parent_recording: parent_recording,
+    actor: Current.actor
   ).recording
 end
 
@@ -35,9 +34,14 @@ Current.actor = user
 
 begin
   # Create the root recording
-  root_recording = RecordingStudio.root_recording_for(workspace)
-  accessible_root_recording = RecordingStudio.root_recording_for(accessible_workspace)
-  private_root_recording = RecordingStudio.root_recording_for(private_workspace)
+  root_recording = RecordingStudio.create_root_recording!(workspace, actor: user)
+  accessible_root_recording = RecordingStudio.create_root_recording!(accessible_workspace, actor: user)
+  private_root_recording = RecordingStudio.create_root_recording!(private_workspace, actor: user)
+  [ root_recording, accessible_root_recording, private_root_recording ].each do |recording|
+    next if RecordingStudioAccessible.authorized?(recording: recording, actor: user, role: :view)
+
+    RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: user).value!
+  end
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
 
@@ -53,7 +57,7 @@ puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{priva
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
 
 admin_root = AdminRoot.find_or_create_by!(name: "Admin")
-admin_recording = RecordingStudio.root_recording_for(admin_root)
+admin_recording = RecordingStudio.create_root_recording!(admin_root, actor: user)
 unless RecordingStudioAccessible.authorized?(recording: admin_recording, actor: user, role: :view)
   RecordingStudioAccessible.bootstrap_owner_access!(recording: admin_recording, actor: user).value!
 end

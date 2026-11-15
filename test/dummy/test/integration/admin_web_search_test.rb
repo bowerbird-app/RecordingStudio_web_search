@@ -207,7 +207,7 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "example.com"
     assert_includes response.body, "A landmark."
     assert_includes response.body, "Succeeded"
-    assert_select "div.fp-text.font-semibold", text: "Sydney Opera House"
+    assert_select "div.fp-text[data-fp-weight='semibold']", text: "Sydney Opera House"
     assert_select "div.fp-text", text: "example.com"
     assert_select "p.fp-text", text: "A landmark."
     assert_select "a[href='https://www.example.com/opera']"
@@ -398,7 +398,7 @@ class AdminWebSearchTest < ActionDispatch::IntegrationTest
 
   def grant_admin!(user)
     admin_root = AdminRoot.find_or_create_by!(name: "Admin")
-    recording = RecordingStudio.root_recording_for(admin_root)
+    recording = RecordingStudio.create_root_recording!(admin_root, actor: user)
     return if RecordingStudioAccessible.authorized?(recording: recording, actor: user, role: :view)
 
     RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: user).value!

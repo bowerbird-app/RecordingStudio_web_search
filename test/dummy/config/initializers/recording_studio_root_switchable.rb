@@ -28,7 +28,13 @@ RecordingStudioRootSwitchable.configure do |config|
         RecordingStudio.root_recording_for(workspace)
       end
     end
-    scope.access_check = ->(**) { true }
+    # Root Switchable 0.16 refuses the switch page unless the actor can view
+    # the current root. Listing every workspace made a seeded root the current
+    # one for a user who does not own it.
+    scope.access_check = lambda do |actor:, recording:, **|
+      actor.present? &&
+        RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
+    end
 
     scope.default_root = lambda do |roots:, **|
       roots.first
