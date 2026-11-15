@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Root Switchable `v0.11.5` requires `recording_studio` `< 7` and Accessible `~> 0.18`, so it cannot resolve next to core 7. The dummy keeps the gem and pins `v0.16.0`, the published core-7 tag.
 * Dummy roots are created with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` stays find-only.
 * The dummy `authorize_write` allows a present actor, including a root create where `root_recording` is nil.
-* The dummy copies core's `recording_studio_events.root_recording_id` migration. Seeds look up children with `Recording.kept`. Admin uses `access_recording_resolver` and ignores the switched product root. Accessible `admin_root_resolver` points at that admin root so site-wide screens resolve. Seeds and the switcher grant the creating actor owner access on new roots.
+* The dummy copies core's `recording_studio_events.root_recording_id` migration. Seeds look up children with `Recording.kept`. Admin uses `access_recording_resolver` and ignores the switched product root. Accessible `admin_root_resolver` points at that admin root so site-wide screens resolve. Seeds and the switcher grant the creating actor owner access on new roots. The all-workspaces scope lists roots that actor can view.
 * Dummy pins Puma `8.1.0` and `msgpack` `>= 1.8.7` so Bundler Audit passes.
 * Flatpack `0.1.376` renders `FlatPack::Text` weight as `data-fp-weight` instead of a `font-semibold` class. The run page still passes `weight: :semibold`.
 
