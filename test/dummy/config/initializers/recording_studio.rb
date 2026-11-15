@@ -10,6 +10,12 @@ RecordingStudio.configure do |config|
 
   config.actor = -> { Current.actor }
 
+  # Core 7 refuses writes until a host authorizer is set. A present actor may
+  # create a root (root_recording is nil on that call) and may record children.
+  config.authorize_write = lambda { |actor:, **|
+    actor.present?
+  }
+
   config.event_notifications_enabled = true
 
   config.idempotency_mode = :return_existing

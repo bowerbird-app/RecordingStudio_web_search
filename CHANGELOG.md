@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-15
+
+### Changed
+
+* Require `recording_studio` `>= 7.0`, `< 8.0`. Development pins Recording Studio `v7.0.0` and Flatpack `v0.1.376`.
+* Dummy pins move to the core-7 addon tags that this app already mounts: Accessible `v0.44.0`, Admin `v2.16.0`, AI `v0.22.0`, API `v0.24.0`, Icons `v0.2.1`, Moveable `v5.0.0`, Metrics `v0.9.0`, Logs `v0.8.0`, Trashable `v0.17.0`, and Cache `v0.6.3`.
+* Root Switchable `v0.11.5` requires `recording_studio` `< 7` and Accessible `~> 0.18`, so it cannot resolve next to core 7. The dummy keeps the gem and pins `v0.16.0`, the published core-7 tag.
+* Dummy roots are created with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` stays find-only.
+* The dummy `authorize_write` allows a present actor, including a root create where `root_recording` is nil.
+* The dummy copies core's `recording_studio_events.root_recording_id` migration. Seeds look up children with `Recording.kept`. Admin uses `access_recording_resolver` and ignores the switched product root. Accessible `admin_root_resolver` points at that admin root so site-wide screens resolve. Seeds and the switcher grant the creating actor owner access on new roots.
+* Dummy pins Puma `8.1.0` and `msgpack` `>= 1.8.7` so Bundler Audit passes.
+* Flatpack `0.1.376` renders `FlatPack::Text` weight as `data-fp-weight` instead of a `font-semibold` class. The run page still passes `weight: :semibold`.
+
+### Upgrade notes
+
+- Install Recording Studio 7.0 or newer, and below 8. Flatpack stays `>= 0.1.341` in the gemspec. This repo pins `v0.1.376`.
+- Call sites that created a root through `root_recording_for` call `create_root_recording!(recordable, actor:)`. Lookup call sites keep `root_recording_for` and handle `nil`.
+- Set `config.authorize_write`. Root creation calls it with `recording`, `root_recording`, and `parent_recording` all nil.
+- Copy Recording Studio's events `root_recording_id` migration into the host and migrate. This gem ships no migration of its own.
+- Trashable 0.17 removed `kept_sql`. Use `Recording.kept`.
+- Admin 2.16 dropped `site_admin_recording_resolver`. Use `access_recording_resolver`.
+- See [UPGRADING.md](UPGRADING.md#090).
+
 ## [0.8.0] - 2026-11-12
 
 ### Added
@@ -187,7 +210,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.0...v0.6.1
