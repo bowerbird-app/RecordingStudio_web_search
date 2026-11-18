@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upgrade notes
 
 - Install Recording Studio 7.7.1 and Flatpack `v0.1.378` from GitHub. Hosts that mount API 1.15 need Accessible 0.50 or newer and a `config/recording_studio_api.yml`.
-- This gem ships no migration. Do not copy Recording Studio's 7.4, 7.5, or 7.7 root migrations unless the host chooses to.
+- This gem ships no migrations. Hosts that move to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 root migrations. Only this repo's dummy app leaves them out.
 - See [UPGRADING.md](UPGRADING.md#091).
 
 ## [0.9.0] - 2026-11-15

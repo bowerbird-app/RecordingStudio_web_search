@@ -19,11 +19,12 @@ accept those tags, so they stay `recording_studio` `>= 7.0`, `< 8.0` and
 - The dummy copies API 1.15's
   `add_owner_to_recording_studio_api_api_clients` migration. API client
   tokens write `owner_id`, and the dummy API tests cannot run without it.
-- Recording Studio 7.4, 7.5, and 7.7 root migrations
+- This gem ships no migrations. Hosts that move to Recording Studio 7.7 must
+  run the Recording Studio 7.4, 7.5, and 7.7 root migrations
   (`add_recording_studio_recordings_root_type_creation_index`,
   `enforce_recording_studio_recording_root_invariant`,
-  `replace_recording_studio_recordings_root_index`) are not copied into the
-  dummy.
+  `replace_recording_studio_recordings_root_index`). Only this repo's dummy
+  app leaves those migrations out.
 
 ### Upgrade Steps
 
@@ -42,7 +43,9 @@ Hosts that mount API 1.15 also need Accessible 0.50 or newer and a
 shared: {}
 ```
 
-No migration in this gem.
+This gem ships no migrations. When a host moves to Recording Studio 7.7, run
+the Recording Studio 7.4, 7.5, and 7.7 root migrations. Only this repo's dummy
+app leaves them out.
 
 ## 0.9.0
 
