@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-18
+
+### Changed
+
+* Development pins move to Recording Studio `v7.7.1` and Flatpack `v0.1.378`. The gemspec still accepts `recording_studio` `>= 7.0`, `< 8.0` and `flat_pack` `>= 0.1.341`.
+* Dummy pins move to Accessible `v0.54.0`, Admin `v2.19.0`, AI `v0.25.0`, API `v1.15.0`, Icons `v0.4.1`, Moveable `v6.0.1`, Metrics `v0.9.1`, Logs `v0.8.1`, Trashable `v1.2.0`, and Cache `v0.7.0`. Root Switchable stays `v0.16.0`.
+* The dummy adds a minimal `config/recording_studio_api.yml` so API 1.12+ can boot, and copies API 1.15's owner columns onto API clients. Recording Studio 7.4, 7.5, and 7.7 root migrations stay out of the dummy.
+
+### Upgrade notes
+
+- Install Recording Studio 7.7.1 and Flatpack `v0.1.378` from GitHub. Hosts that mount API 1.15 need Accessible 0.50 or newer and a `config/recording_studio_api.yml`.
+- This gem ships no migrations. Hosts that move to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 root migrations. Only this repo's dummy app leaves them out.
+- See [UPGRADING.md](UPGRADING.md#091).
+
 ## [0.9.0] - 2026-11-15
 
 ### Changed
@@ -210,7 +224,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Searches chart of each day in the last 4 weeks, and a provider filter on the dummy search form
 - Search log keeps a page snapshot, and the results count opens that run
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_web_search/compare/v0.6.1...v0.7.0

@@ -1,5 +1,52 @@
 # Upgrading
 
+## 0.9.1
+
+This release moves the development pins to Recording Studio 7.7.1 and Flatpack
+0.1.378. Search behavior is otherwise the same. The gemspec ranges already
+accept those tags, so they stay `recording_studio` `>= 7.0`, `< 8.0` and
+`flat_pack` `>= 0.1.341`. This gem ships no migration.
+
+### What Changed
+
+- Development pins: Recording Studio `v7.7.1` and Flatpack `v0.1.378`.
+- Dummy pins: Accessible `v0.54.0`, Admin `v2.19.0`, AI `v0.25.0`, API
+  `v1.15.0`, Icons `v0.4.1`, Moveable `v6.0.1`, Metrics `v0.9.1`, Logs
+  `v0.8.1`, Trashable `v1.2.0`, and Cache `v0.7.0`. Root Switchable stays
+  `v0.16.0`.
+- The dummy adds a minimal `config/recording_studio_api.yml` (`shared: {}`)
+  because API 1.12+ raises at boot when that file is missing.
+- The dummy copies API 1.15's
+  `add_owner_to_recording_studio_api_api_clients` migration. API client
+  tokens write `owner_id`, and the dummy API tests cannot run without it.
+- This gem ships no migrations. Hosts that move to Recording Studio 7.7 must
+  run the Recording Studio 7.4, 7.5, and 7.7 root migrations
+  (`add_recording_studio_recordings_root_type_creation_index`,
+  `enforce_recording_studio_recording_root_invariant`,
+  `replace_recording_studio_recordings_root_index`). Only this repo's dummy
+  app leaves those migrations out.
+
+### Upgrade Steps
+
+Pin Recording Studio 7.7.1 and Flatpack `v0.1.378` from GitHub:
+
+```ruby
+gem "recording_studio", git: "https://github.com/bowerbird-app/RecordingStudio.git", tag: "v7.7.1"
+gem "flat_pack", git: "https://github.com/bowerbird-app/flatpack.git", tag: "v0.1.378"
+```
+
+Hosts that mount API 1.15 also need Accessible 0.50 or newer and a
+`config/recording_studio_api.yml`. A minimal file is enough:
+
+```yaml
+# Minimal host config so Recording Studio API can boot.
+shared: {}
+```
+
+This gem ships no migrations. When a host moves to Recording Studio 7.7, run
+the Recording Studio 7.4, 7.5, and 7.7 root migrations. Only this repo's dummy
+app leaves them out.
+
 ## 0.9.0
 
 This release requires Recording Studio 7.0 or newer, and below 8. Search behavior

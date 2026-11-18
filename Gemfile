@@ -6,8 +6,8 @@ source "https://rubygems.org"
 gemspec
 
 # flat_pack and recording_studio are not published to RubyGems.
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.376"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.378"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.7.1"
 # Keep the current lock. Do not bump view_component with this sweep.
 gem "view_component", "4.20.0"
 
